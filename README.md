@@ -1,5 +1,5 @@
-# ineqSolver
-This is the official code for the paper INT: An Inequality Dataset for Evaluating Generalization in Theorem Proving.
+# INT
+This is the official code for the paper INT: An Inequality Benchmark for Evaluating Generalization in Theorem Proving.
 
 The directory contains
 
@@ -25,8 +25,8 @@ The software packages required are:
 
 ## Setup
 ```bash
-git clone https://github.com/albertqjiang/ineqSolver
-cd ineqSolver
+git clone https://github.com/albertqjiang/INT
+cd INT
 export PYTHONPATH="$PWD:$PYTHONPATH"
 ```
 
