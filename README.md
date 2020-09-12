@@ -40,7 +40,7 @@ python data_generation/combos_and_orders.py --combo_path data/benchmark/field --
 After getting the axiom combinations and orders, we can use them to generate synthetic theorems and proofs.
 The command below generates 100 separate theorems and corresponding proofs with the parameters k=5, l=5.
 ```bash
-python data_generation/generate_problems.py --combo_path data/benchmark/field --k 5 --l 5 --num_probs 100
+python data_generation/generate_problems.py --orders_path data/benchmark/field -k 5 -l 5 --num_probs 100
 ```
 
 
