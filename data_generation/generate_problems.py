@@ -328,8 +328,9 @@ def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
     all_steps = []
     all_first_steps = []
 
-    for _ in range(num_probs):
-        print("Problem {}".format(len(separate_problems) + 1))
+    for i in range(num_probs):
+        if i % 100 == 0:
+            print("Problem {}".format(len(separate_problems) + 1))
         steps = generate_problem(num_axioms, length, **kwargs)
         all_steps.extend(steps)
         all_first_steps.append(steps[0])
