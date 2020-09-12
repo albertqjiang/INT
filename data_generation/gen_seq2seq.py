@@ -62,8 +62,10 @@ def convert_proof_to_seq2seq(steps, add_theorem_name=True):
     return sources, targets
 
 
-def generate_multiple_seq2seq(multiple_problems, add_theorem_name=True):
-    all_sources_to_targets = dict()
+def generate_multiple_seq2seq(multiple_problems, all_sources_to_targets=None, add_theorem_name=True):
+    if not all_sources_to_targets:
+        all_sources_to_targets = dict()
+
     for problem in multiple_problems:
         sources, targets = convert_proof_to_seq2seq(problem, add_theorem_name=add_theorem_name)
         for source, target in zip(sources, targets):
@@ -86,10 +88,21 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     orders = json.load(open(os.path.join(args.orders_path, "orders.json"), "r"))
-    datasets, problems = generate_multiple_problems(num_axioms=args.k, length=args.l,
-                                                    num_probs=args.num_probs, train_test="train",
-                                                    orders=orders, degree=args.degree)
-    sources_to_targets = generate_multiple_seq2seq(multiple_problems=problems, add_theorem_name=args.add_theorem_name)
+    if args.num_probs > 10000:
+        sources_to_targets = None
+        for _ in range(int(args.num_probs/1000)):
+            datasets, problems = generate_multiple_problems(num_axioms=args.k, length=args.l,
+                                                            num_probs=1000, train_test="train",
+                                                            orders=orders, degree=args.degree)
+            sources_to_targets = generate_multiple_seq2seq(multiple_problems=problems,
+                                                           all_sources_to_targets=sources_to_targets,
+                                                           add_theorem_name=args.add_theorem_name)
+    else:
+        datasets, problems = generate_multiple_problems(num_axioms=args.k, length=args.l,
+                                                        num_probs=args.num_probs, train_test="train",
+                                                        orders=orders, degree=args.degree)
+        sources_to_targets = generate_multiple_seq2seq(multiple_problems=problems,
+                                                       add_theorem_name=args.add_theorem_name)
     # for source in sorted(sources_to_targets):
     #     print("Source:", source, "; Target:", sources_to_targets[source])
     randomised_keys = list(sources_to_targets.keys())
