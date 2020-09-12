@@ -76,8 +76,8 @@ def generate_multiple_seq2seq(multiple_problems, add_theorem_name=True):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Mode generator')
     parser.add_argument('--orders_path',
-                        default="/Users/qj213/Papers/My papers/INT_arXiv/INT/data/benchmark/field")
-    parser.add_argument('--dump_path', '-dp', required=True)
+                        default="/scratch/hdd001/home/ajiang/data/INT/ordered_field")
+    parser.add_argument('--dump_path', '-dp', default="/scratch/hdd001/home/ajiang/data/INT/seq")
     parser.add_argument('-k', type=int)
     parser.add_argument('-l', type=int)
     parser.add_argument('--degree', type=int, default=0)
