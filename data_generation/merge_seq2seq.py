@@ -18,6 +18,7 @@ def remove_spaces_and_split(input_string):
     output_string = input_string.replace(" ", "")
     output_string = output_string.replace(r"\geq", ">=")
     output_string = output_string.replace(r"\frac", "/")
+    output_string = output_string.replace(r"ø", "emp")
     return " ".join(list(output_string))
 
 
