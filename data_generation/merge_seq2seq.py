@@ -25,7 +25,7 @@ def remove_spaces_and_split(input_string):
 sources_to_targets = dict()
 
 for kl_dir in sorted(os.listdir(args.path)):
-    if kl_dir.startswith("pre"):
+    if kl_dir.startswith("pre") or kl_dir.startswith("chared"):
         continue
     with open(os.path.join(args.path, kl_dir, "all.src")) as f_src:
         with open(os.path.join(args.path, kl_dir, "all.tgt")) as f_tgt:
