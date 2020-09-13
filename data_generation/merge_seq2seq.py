@@ -16,7 +16,7 @@ if not os.path.isdir(args.output_path):
 
 def remove_spaces_and_split(input_string):
     output_string = input_string.replace("  ", " ")
-    output_string = output_string.replace(r"\geq", ">=")
+    output_string = output_string.replace(r"\geq ", ">=")
     output_string = output_string.replace(r"\frac", "/")
     output_string = output_string.replace(r"ø", "emp")
     return output_string
