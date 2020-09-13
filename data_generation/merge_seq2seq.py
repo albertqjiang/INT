@@ -39,24 +39,24 @@ train_keys = source_keys_randomised[:-2000]
 valid_keys = source_keys_randomised[-2000:-1000]
 test_keys = source_keys_randomised[-1000:]
 
-with open(os.path.join(args.output_path, "train.src")) as train_src:
-    with open(os.path.join(args.output_path, "train.tgt")) as train_tgt:
+with open(os.path.join(args.output_path, "train.src"), "w") as train_src:
+    with open(os.path.join(args.output_path, "train.tgt"), "w") as train_tgt:
         for train_key in train_keys:
             train_src.write(train_key)
             train_src.write("\n")
             train_tgt.write(sources_to_targets[train_key])
             train_tgt.write("\n")
 
-with open(os.path.join(args.output_path, "valid.src")) as valid_src:
-    with open(os.path.join(args.output_path, "valid.tgt")) as valid_tgt:
+with open(os.path.join(args.output_path, "valid.src"), "w") as valid_src:
+    with open(os.path.join(args.output_path, "valid.tgt"), "w") as valid_tgt:
         for valid_key in valid_keys:
             valid_src.write(valid_key)
             valid_src.write("\n")
             valid_tgt.write(sources_to_targets[valid_key])
             valid_tgt.write("\n")
 
-with open(os.path.join(args.output_path, "test.src")) as test_src:
-    with open(os.path.join(args.output_path, "test.tgt")) as test_tgt:
+with open(os.path.join(args.output_path, "test.src"), "w") as test_src:
+    with open(os.path.join(args.output_path, "test.tgt"), "w") as test_tgt:
         for test_key in test_keys:
             test_src.write(test_key)
             test_src.write("\n")
