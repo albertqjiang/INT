@@ -9,13 +9,13 @@ from proof_system.graph_seq_conversion import Parser
 
 
 random.seed(213)
-parser = Parser()
+proof_parser = Parser()
 
 
 def convert_proof_to_seq2seq(steps):
     sources, targets = list(), list()
     for i, step in enumerate(steps):
-        source, target = parser.parse_proof_step_to_seq(step)
+        source, target = proof_parser.parse_proof_step_to_seq(step)
         sources.append(source)
         targets.append(target)
     return sources, targets
