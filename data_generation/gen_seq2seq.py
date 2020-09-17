@@ -4,33 +4,11 @@ import os
 import random
 
 from data_generation.generate_problems import generate_multiple_problems
+from proof_system.graph_seq_conversion import compact_theorem_name
 from visualization.latex_parse import logic_statement_to_latex
 
 
 random.seed(213)
-
-
-compact_theorem_name = {
-    "AdditionCommutativity": "add_cmmt",
-    "AdditionAssociativity": "add_assc",
-    "AdditionZero": "add_zero",
-    "AdditionSimplification": "add_simp",
-    "MultiplicationCommutativity": "mul_cmmt",
-    "MultiplicationAssociativity": "mul_assc",
-    "MultiplicationOne": "mul_one",
-    "MultiplicationSimplification": "mul_simp",
-    "AdditionMultiplicationLeftDistribution": "add_mul_l_dist",
-    "AdditionMultiplicationRightDistribution": "add_mul_r_dist",
-    "SquareDefinition": "sqr_def",
-    "EquivalenceSymmetry": "equ_symm",
-    "PrincipleOfEquality": "equ_prin",
-    "EquMoveTerm": "equ_mv_tm",
-    "IneqMoveTerm": "ineq_mv_tm",
-    "SquareGEQZero": "sqr_geq_zero",
-    "EquivalenceImpliesDoubleInequality": "equ_dbl_ineq",
-    "FirstPrincipleOfInequality": "ineq_prin_one",
-    "SecondPrincipleOfInequality": "ineq_prin_two"
-}
 
 
 def convert_proof_to_seq2seq(steps, add_theorem_name=True):
