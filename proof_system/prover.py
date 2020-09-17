@@ -1,4 +1,5 @@
 from proof_system.logic_functions import necessary_logic_functions
+from proof_system.graph_seq_conversion import Parser
 
 
 class Prover:
@@ -35,6 +36,8 @@ class Prover:
         self.objective_ids = self.add_logic_statements(self.objectives)
 
         self.update_conditions()
+
+        self.parser = Parser()
 
     @staticmethod
     def _trivial(logic_statement):

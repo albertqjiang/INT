@@ -89,17 +89,20 @@ class TheoremProver(gym.Env):
             if self.eval_finish:
                 return self._get_obs(), 0, False, {"eval_finish": True}
 
-        lemma = all_axioms_to_prove[index2thm[action[0]]]
-        input_entities = list()
-        for input_entity_index in action[1:]:
-            input_entity_index -= 1
-            if input_entity_index != -1:
-                try:
-                    entity = self.ind_to_ent[input_entity_index][0]
-                except:
-                    print(self.ind_to_ent)
-                    print(input_entity_index)
-                input_entities.append(entity)
+        if self.obs_mode == "seq":
+            lemma, input_entities = self.proof.parser.find_action(self.proof.get_observation(), action)
+        else:
+            lemma = all_axioms_to_prove[index2thm[action[0]]]
+            input_entities = list()
+            for input_entity_index in action[1:]:
+                input_entity_index -= 1
+                if input_entity_index != -1:
+                    try:
+                        entity = self.ind_to_ent[input_entity_index][0]
+                    except:
+                        print(self.ind_to_ent)
+                        print(input_entity_index)
+                    input_entities.append(entity)
 
         if self.verbo:
             info = {
@@ -161,6 +164,9 @@ class TheoremProver(gym.Env):
             return self._get_obs(), reward, done, info
 
     def _get_obs(self):
+        if self.obs_mode == "seq":
+            return self.parser.observation_to_source(self.proof.get_observation())
+
         obs = {
             "objectives": self.proof.get_objectives(),
             "ground_truth": self.proof.get_ground_truth()

@@ -2,50 +2,31 @@ import argparse
 import json
 import os
 import random
+import pickle
 
 from data_generation.generate_problems import generate_multiple_problems
-from proof_system.graph_seq_conversion import compact_theorem_name
-from visualization.latex_parse import logic_statement_to_latex
+from proof_system.graph_seq_conversion import Parser
 
 
 random.seed(213)
+parser = Parser()
 
 
-def convert_proof_to_seq2seq(steps, add_theorem_name=True):
+def convert_proof_to_seq2seq(steps):
     sources, targets = list(), list()
     for i, step in enumerate(steps):
-        if len(step["observation"]["objectives"]) != 1:
-            continue
-
-        premises = step["observation"]["ground_truth"]
-        premises_string = " & ".join([logic_statement_to_latex(premise) for premise in premises])
-        source = premises_string + " to " + logic_statement_to_latex(step["observation"]["objectives"][0])
+        source, target = parser.parse_proof_step_to_seq(step)
         sources.append(source)
-
-        target = ""
-        if add_theorem_name:
-            theorem_name = compact_theorem_name[step["lemma"].name]
-            target += theorem_name + " "
-        target += "| "
-
-        if i != len(steps) - 1:
-            next_step = steps[i+1]
-            next_premises = next_step["observation"]["ground_truth"]
-            next_premises_string = " & ".join([logic_statement_to_latex(premise) for premise in next_premises])
-            target += next_premises_string + " to " + \
-                      logic_statement_to_latex(next_step["observation"]["objectives"][0])
-        else:
-            target += "ø"
         targets.append(target)
     return sources, targets
 
 
-def generate_multiple_seq2seq(multiple_problems, all_sources_to_targets=None, add_theorem_name=True):
+def generate_multiple_seq2seq(multiple_problems, all_sources_to_targets=None):
     if not all_sources_to_targets:
         all_sources_to_targets = dict()
 
     for problem in multiple_problems:
-        sources, targets = convert_proof_to_seq2seq(problem, add_theorem_name=add_theorem_name)
+        sources, targets = convert_proof_to_seq2seq(problem)
         for source, target in zip(sources, targets):
             if source in all_sources_to_targets:
                 continue
@@ -57,32 +38,30 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Mode generator')
     parser.add_argument('--orders_path',
                         default="/scratch/hdd001/home/ajiang/data/INT/ordered_field")
-    parser.add_argument('--dump_path', '-dp', default="/scratch/hdd001/home/ajiang/data/INT/seq")
+    parser.add_argument('--dump_path', '-dp', default="/scratch/hdd001/home/ajiang/data/INT/seq_exec")
     parser.add_argument('-k', type=int)
     parser.add_argument('-l', type=int)
     parser.add_argument('--degree', type=int, default=0)
     parser.add_argument('--num_probs', type=int, default=1)
-    parser.add_argument('--add_theorem_name', "-atname", default=True, action='store_false')
     args = parser.parse_args()
 
     orders = json.load(open(os.path.join(args.orders_path, "orders.json"), "r"))
     if args.num_probs > 10000:
         sources_to_targets = None
-        for _ in range(int(args.num_probs/1000)):
+        for j in range(int(args.num_probs/1000)):
             datasets, problems = generate_multiple_problems(num_axioms=args.k, length=args.l,
                                                             num_probs=1000, train_test="train",
                                                             orders=orders, degree=args.degree)
             sources_to_targets = generate_multiple_seq2seq(multiple_problems=problems,
-                                                           all_sources_to_targets=sources_to_targets,
-                                                           add_theorem_name=args.add_theorem_name)
+                                                           all_sources_to_targets=sources_to_targets)
+            pickle.dump(problems, open(os.path.join(args.dump_path, "problems_part{}.pkl".format(j+1)), "wb"))
     else:
         datasets, problems = generate_multiple_problems(num_axioms=args.k, length=args.l,
                                                         num_probs=args.num_probs, train_test="train",
                                                         orders=orders, degree=args.degree)
-        sources_to_targets = generate_multiple_seq2seq(multiple_problems=problems,
-                                                       add_theorem_name=args.add_theorem_name)
-    # for source in sorted(sources_to_targets):
-    #     print("Source:", source, "; Target:", sources_to_targets[source])
+        sources_to_targets = generate_multiple_seq2seq(multiple_problems=problems)
+        pickle.dump(problems, open(os.path.join(args.dump_path, "problems.pkl"), "wb"))
+
     randomised_keys = list(sources_to_targets.keys())
     random.shuffle(randomised_keys)
 

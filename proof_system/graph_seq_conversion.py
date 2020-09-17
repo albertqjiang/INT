@@ -1,7 +1,5 @@
 from visualization.seq_parse import entity_to_seq_string, logic_statement_to_seq_string
 from proof_system.all_axioms import all_axioms_to_prove
-from logic.logic import Entity, LogicStatement
-from logic.utils import standard_numerical_functions
 
 
 compact_theorem_name = {
@@ -94,20 +92,23 @@ class Parser:
 
         return self.filter_seq_string(target)
 
-    def parse_proof_step_to_seq(self, step, next_step=None, is_last_step=None, pretraining=False):
-        if len(step["observation"]["objectives"]) != 1:
-            return
-
-        # Source, the goal and premises before applying the theorem
-        premises = step["observation"]["ground_truth"]
+    def observation_to_source(self, observation):
+        premises = observation["ground_truth"]
         premises_string = " & ".join([logic_statement_to_seq_string(premise) for premise in premises])
         if premises_string:
             source = premises_string + " to "
         else:
             source = "to "
-        source = source + logic_statement_to_seq_string(step["observation"]["objectives"][0])
+        source = source + logic_statement_to_seq_string(observation["objectives"][0])
         source = self.filter_seq_string(source)
+        return source
 
+    def parse_proof_step_to_seq(self, step, next_step=None, is_last_step=None, pretraining=False):
+        # if len(step["observation"]["objectives"]) != 1:
+        #     return
+
+        # Source, the goal and premises before applying the theorem
+        source = self.observation_to_source(step["observation"])
         if pretraining:
             return source, self.pretraining_target(step=step, next_step=next_step, is_last_step=is_last_step)
         else:
@@ -170,7 +171,7 @@ if __name__ == "__main__":
     from data_generation.generate_problems import generate_multiple_problems
     orders = json.load(open("/Users/qj213/Papers/My papers/INT_arXiv/INT/data/benchmark/ordered_field/orders.json"))
     dataset, problems = generate_multiple_problems(num_axioms=3, length=3,
-                                                   num_probs=1000, train_test="train",
+                                                   num_probs=100, train_test="train",
                                                    orders=orders, degree=0)
     parser = Parser()
     for problem in problems:
