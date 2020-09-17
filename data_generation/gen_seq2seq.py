@@ -45,6 +45,9 @@ if __name__ == "__main__":
     parser.add_argument('--num_probs', type=int, default=1)
     args = parser.parse_args()
 
+    if not os.path.isdir(args.dump_path):
+        os.makedirs(args.dump_path)
+
     orders = json.load(open(os.path.join(args.orders_path, "orders.json"), "r"))
     if args.num_probs > 10000:
         sources_to_targets = None
