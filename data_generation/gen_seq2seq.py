@@ -50,7 +50,7 @@ if __name__ == "__main__":
     if not os.path.isdir(args.dump_path):
         os.makedirs(args.dump_path)
 
-    combos = json.load(open(os.path.join(args.orders_path, "combos.json"), "r"))
+    combos = json.load(open(os.path.join(args.orders_path, "combinations.json"), "r"))
     orders = json.load(open(os.path.join(args.orders_path, "orders.json"), "r"))
     if args.num_probs > 10000:
         sources_to_targets = None
