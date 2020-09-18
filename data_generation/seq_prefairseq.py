@@ -25,12 +25,12 @@ all_problems = list()
 
 for file_name in sorted(os.listdir(args.input)):
     if file_name.startswith("problems_part"):
-        all_problems.append(pickle.load(open(osp.join(args.input, file_name), "rb")))
+        all_problems.extend(pickle.load(open(osp.join(args.input, file_name), "rb")))
 
 distinct_problems = list()
 distinct_goals = set()
 for problem in all_problems:
-    if problem[0][0]["observation"]["objectives"][0].name not in distinct_goals:
+    if problem[0]["observation"]["objectives"][0].name not in distinct_goals:
         distinct_goals.add(problem[0]["observation"]["objectives"][0].name)
         distinct_problems.append(problem)
 
