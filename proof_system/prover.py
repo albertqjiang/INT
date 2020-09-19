@@ -242,6 +242,10 @@ class Prover:
             "progress": progress
         }
 
+    def apply_theorem_seq_style(self, exec_seq):
+        lemma, input_entities = self.parser.find_action(self.get_observation(), exec_seq)
+        return self.apply_theorem(lemma, input_entities)
+
     def is_proved(self):
         if self.prove_direction == "forward":
             # In forward generation, this should always be false.
