@@ -203,6 +203,7 @@ def main(args):
     ###################################################
     # INT stuff starts here
     ###################################################
+    f_out = open(os.path.join(args.result_path), "w")
 
     # Load test problems to evaluate
     test_problems = pickle.load(open(os.path.join(args.test_problems_path, "test_problems.pkl"), "rb"))
@@ -213,7 +214,7 @@ def main(args):
                              conditions=test_step_1["observation"]["ground_truth"],
                              objectives=test_step_1["observation"]["objectives"],
                              prove_direction="backward")
-        for _ in range(10):
+        for _ in range(15):
             if test_prover.is_proved():
                 break
             source = test_prover.parser.observation_to_source(test_prover.get_observation())
@@ -261,10 +262,10 @@ def main(args):
             for id_, src_tokens, hypos, info in sorted(results, key=lambda x: x[0]):
                 if src_dict is not None:
                     src_str = src_dict.string(src_tokens, args.remove_bpe)
-                    print('S-{}\t{}'.format(id_, src_str))
-                    print("W-{}\t{:.3f}\tseconds".format(id_, info["time"]))
+                    f_out.write('S-{}\t{}\n'.format(id_, src_str))
+                    f_out.write("W-{}\t{:.3f}\tseconds\n".format(id_, info["time"]))
                     for constraint in info["constraints"]:
-                        print("C-{}\t{}".format(id_, tgt_dict.string(constraint, args.remove_bpe)))
+                        f_out.write("C-{}\t{}\n".format(id_, tgt_dict.string(constraint, args.remove_bpe)))
 
                 # Process top predictions
                 for hypo in hypos[:min(len(hypos), args.nbest)]:
@@ -280,28 +281,27 @@ def main(args):
                     detok_hypo_str = decode_fn(hypo_str)
                     score = hypo['score'] / math.log(2)  # convert to base 2
                     # original hypothesis (after tokenization and BPE)
-                    print('H-{}\t{}\t{}'.format(id_, score, hypo_str))
+                    f_out.write('H-{}\t{}\t{}\n'.format(id_, score, hypo_str))
 
                     exec_string = chared_to_string(hypo_str.split())
-                    print("Execution string:", exec_string)
+                    f_out.write("Execution string:" + exec_string + "\n")
                     try:
                         result = test_prover.apply_theorem_seq_style(exec_string)
-                        print(result)
+                        # f_out.write(result)
                     except Exception:
                         continue
                     if test_prover.is_proved():
                         proofs_closed += 1
                         break
-                    print("Objec: ",
-                          " ".join(filter_arrow(test_prover.parser.observation_to_source(test_prover.get_observation()))))
+                    f_out.write("Objec: " + " ".join(filter_arrow(
+                        test_prover.parser.observation_to_source(test_prover.get_observation()))) + "\n")
 
                     if result["progress"]:
                         break
 
-
                     # detokenized hypothesis
-                    print('D-{}\t{}\t{}'.format(id_, score, detok_hypo_str))
-                    print('P-{}\t{}'.format(
+                    f_out.write('D-{}\t{}\t{}\n'.format(id_, score, detok_hypo_str))
+                    f_out.write('P-{}\t{}\n'.format(
                         id_,
                         ' '.join(map(
                             lambda x: '{:.4f}'.format(x),
@@ -311,16 +311,20 @@ def main(args):
                     ))
                     if args.print_alignment:
                         alignment_str = " ".join(["{}-{}".format(src, tgt) for src, tgt in alignment])
-                        print('A-{}\t{}'.format(
+                        f_out.write('A-{}\t{}\n'.format(
                             id_,
                             alignment_str
                         ))
 
             # update running id_ counter
             start_id += len(inputs)
+        if test_prover.is_proved():
+            f_out.write("Proof closed\n")
+        if not test_prover.is_proved():
+            f_out.write("Proof failed\n")
 
-    logger.info("Total time: {:.3f} seconds; translation time: {:.3f}".format(time.time() - start_time, total_translate_time))
-    print("We closed {} proofs out of {} in total. Proportion: {}"
+    logger.info("Total time: {:.3f} seconds; translation time: {:.3f}\n".format(time.time() - start_time, total_translate_time))
+    f_out.write("We closed {} proofs out of {} in total. Proportion: {}\n"
           .format(proofs_closed, len(test_problems), proofs_closed/len(test_problems)))
     json.dump('{percent:.2%}'.format(percent=proofs_closed / len(test_problems)),
               open(os.path.join(args.dump_path, args.fingerprint), "w"))
