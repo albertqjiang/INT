@@ -203,7 +203,9 @@ def main(args):
     ###################################################
     # INT stuff starts here
     ###################################################
-    f_out = open(os.path.join(args.results_path), "w")
+    if not os.path.isdir(args.dump_path):
+        os.makedirs(args.dump_path)
+    f_out = open(args.results_path, "w")
 
     # Load test problems to evaluate
     test_problems = pickle.load(open(os.path.join(args.test_problems_path, "test_problems.pkl"), "rb"))
