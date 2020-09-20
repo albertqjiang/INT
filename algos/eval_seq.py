@@ -41,12 +41,12 @@ def process_fairseq_generation_file(generation_file_folder):
 def execute_according_to_dictionary(prover, dictionary):
     source = prover.parser.observation_to_source(prover.get_observation())
     if source not in dictionary:
-        return
+        return "no source"
     target = dictionary[source]
     try:
         result = prover.apply_theorem_seq_style(target)
     except Exception:
-        return
+        return "invalid"
     return result["progress"]
 
 
@@ -61,6 +61,7 @@ def eval_seq_model(src_path, hyp_path, test_problems_path, eval_fingerprint, dum
     # Load test problems to evaluate
     test_problems = pickle.load(open(os.path.join(test_problems_path, "test_problems.pkl"), "rb"))
     proofs_closed = 0
+
     for test_problem in test_problems:
         test_step_1 = test_problem[1]
         test_prover = Prover(axioms=all_axioms_to_prove,
@@ -74,7 +75,7 @@ def eval_seq_model(src_path, hyp_path, test_problems_path, eval_fingerprint, dum
             if test_prover.is_proved():
                 proofs_closed += 1
                 break
-    json.dump([proofs_closed/len(test_problems)], open(os.path.join(dump_path, eval_fingerprint), "w"))
+    json.dump(proofs_closed/len(test_problems), open(os.path.join(dump_path, eval_fingerprint), "w"))
 
 
 if __name__ == "__main__":
