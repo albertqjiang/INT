@@ -29,6 +29,8 @@ def process_fairseq_generation_file(generation_file_folder):
         os.path.join(generation_file_folder, "test.hyp")
     with open(source_path, "w") as src_out, open(hypothesis_path, "w") as hyp_out:
         for index in sorted(indices_to_contents.keys()):
+            if "source" not in indices_to_contents[index] or "hypothesis" not in indices_to_contents[index]:
+                continue
             src_out.write(indices_to_contents[index]["source"])
             src_out.write("\n")
             hyp_out.write(indices_to_contents[index]["hypothesis"])
@@ -49,6 +51,7 @@ def execute_according_to_dictionary(prover, dictionary):
 
 
 def eval_seq_model(src_path, hyp_path, test_problems_path, eval_fingerprint, dump_path):
+    # TODO: save n best responses
     # Load generated question-answer pairs
     sources_to_targets = dict()
     with open(src_path) as src_r, open(hyp_path) as tgt_r:
@@ -56,7 +59,7 @@ def eval_seq_model(src_path, hyp_path, test_problems_path, eval_fingerprint, dum
                 sources_to_targets[src_line.strip()] = tgt_line.strip()
 
     # Load test problems to evaluate
-    test_problems = pickle.load(open(test_problems_path, "rb"))
+    test_problems = pickle.load(open(os.path.join(test_problems_path, "test_problems.pkl"), "rb"))
     proofs_closed = 0
     for test_problem in test_problems:
         test_step_1 = test_problem[1]
@@ -79,7 +82,8 @@ if __name__ == "__main__":
     parser.add_argument('--fairseq-generate-path', '-fgp')
     parser.add_argument('--dump-path', help='The dump path')
     parser.add_argument('--test-problems-path', '-tpp', help='The test problems path')
+    parser.add_argument("--fingerprint", "-f")
     args = parser.parse_args()
 
     src_path, hyp_path = process_fairseq_generation_file(args.fairseq_generate_path)
-    eval_seq_model(src_path, hyp_path, args.test_problems_path, "debug", args.dump_path)
+    eval_seq_model(src_path, hyp_path, args.test_problems_path, args.fingerprint, args.dump_path)
