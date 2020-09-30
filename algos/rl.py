@@ -17,7 +17,6 @@ from algos.lib.arguments import get_args
 from algos.eval import eval_agent
 from algos.lib.envs import make_thm_vec_envs
 from algos.lib.obs import nodename2index, thm2index
-from legacy.data_generation.random_numerical_specified import load_online_combo_and_length
 from algos.lib.ops import turn_grad_on_off
 from algos.model.thm_model import ThmNet
 from data_generation.utils import Dataset

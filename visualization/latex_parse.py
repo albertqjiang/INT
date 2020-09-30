@@ -200,30 +200,3 @@ def decorate_string(s):
         return s.replace(r"=", r"= \\ ").replace(r"\geq", r"\geq \\ ").replace(r"\leq", r"\leq \\ ")
     return s
 
-
-if __name__ == "__main__":
-    a = Entity(name="a")
-    b = Entity(name="b")
-    c = Entity(name="c")
-    a_and_b = standard_numerical_functions["add"].execute_nf([a, b])
-    a_and_b_sub_c = standard_numerical_functions["sub"].execute_nf([a_and_b, c])
-    entity = standard_numerical_functions["sqr"].execute_nf([a_and_b_sub_c])
-
-    import pickle
-    from legacy.connection_prover_exp.connection_prover import ConnectionProver
-    from proof_system.all_axioms import all_axioms
-    from pprint import pprint
-
-    steps_by_objective = dict()
-    steps = pickle.load(open("../data/expansion_dataset/steps_1.p", "rb"))
-    print("Total steps: {}".format(len(steps)))
-
-    proof = ConnectionProver(axioms=all_axioms, conditions=[], objectives=steps[0]["observation"]["objectives"])
-    pprint([logic_statement_to_latex(gt) for gt in proof.get_observation()["ground_truth"]])
-    for i, step in enumerate(steps):
-        pprint(step["lemma"].name)
-        pprint([entity_to_latex(ent) for ent in step["input_entities"]])
-        result = proof.apply_theorem(theorem=step["lemma"], operands=step["input_entities"])
-        pprint(result)
-        pprint([logic_statement_to_latex(gt) for gt in proof.get_observation()["ground_truth"]])
-    assert proof.is_proved()
