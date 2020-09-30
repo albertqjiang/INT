@@ -24,7 +24,7 @@ def get_args():
                         help="whether to use transform_gt")
     parser.add_argument("--online", required=False, action='store_true', default=True)
     parser.add_argument('-cp', "--combo_path", required=True, type=str,
-                        default="/scratch/hdd001/home/ajiang/data/benchmark/random_specified")
+                        default="/scratch/hdd001/home/ANON/data/benchmark/random_specified")
     parser.add_argument("-oog", "--online_order_generation", action='store_true',
                         help="whether to use the axiom combinations to generate orders on the fly")
     parser.add_argument("-nooc", "--num_order_or_combo", required=False, type=int, default=-1,

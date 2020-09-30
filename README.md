@@ -25,7 +25,7 @@ The software packages required are:
 
 ## Setup
 ```bash
-git clone https://github.com/albertqjiang/INT
+git clone https://github.com/GITHUBDIRECTORY
 cd INT
 export PYTHONPATH="$PWD:$PYTHONPATH"
 ```
@@ -56,7 +56,7 @@ python algos/main.py -cp data/benchmark/field -du data/pt_models/ --online -trs 
 ```
 
 ## Documentation for important functions and classes
-[INT/data_generation/generate_problems.py:268](https://github.com/albertqjiang/INT/blob/2ec739c94b2feb5f7f80b3d5e71e8b751dbd9ef3/data_generation/generate_problems.py#L268)
+[INT/data_generation/generate_problems.py:268](https://github.com/GITHUBUSER/INT/blob/2ec739c94b2feb5f7f80b3d5e71e8b751dbd9ef3/data_generation/generate_problems.py#L268)
 ```python
 def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
     """
@@ -120,7 +120,7 @@ def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
 ```
 
     
-[INT/proof_system/prover.py:4](https://github.com/albertqjiang/INT/blob/2ec739c94b2feb5f7f80b3d5e71e8b751dbd9ef3/proof_system/prover.py#L4)
+[INT/proof_system/prover.py:4](https://github.com/GITHUBUSER/INT/blob/2ec739c94b2feb5f7f80b3d5e71e8b751dbd9ef3/proof_system/prover.py#L4)
 ```python
 class Prover:
     def __init__(self, axioms: dict, conditions: list, objectives: list, prove_direction: str):

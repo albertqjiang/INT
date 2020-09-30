@@ -3,7 +3,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-# Modified by Albert Qiaochu Jiang for evaluating INT problems
+# Modified by ANON for evaluating INT problems
 """
 Translate raw text with a trained model. Batches data on-the-fly.
 """

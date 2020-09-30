@@ -37,8 +37,8 @@ def generate_multiple_seq2seq(multiple_problems, all_sources_to_targets=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Mode generator')
     parser.add_argument('--orders_path',
-                        default="/scratch/hdd001/home/ajiang/data/INT/ordered_field")
-    parser.add_argument('--dump_path', '-dp', default="/scratch/hdd001/home/ajiang/data/INT/seq_exec")
+                        default="/scratch/hdd001/home/ANON/data/INT/ordered_field")
+    parser.add_argument('--dump_path', '-dp', default="/scratch/hdd001/home/ANON/data/INT/seq_exec")
     parser.add_argument('-k', type=int)
     parser.add_argument('-l', type=int)
     parser.add_argument('--degree', type=int, default=0)

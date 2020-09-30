@@ -354,7 +354,7 @@ if __name__ == "__main__":
     parser.add_argument('--orders_path',
                         default="data/benchmark/field")
     parser.add_argument('--dump_path', '-dp',
-                        default="/scratch/hdd001/home/ajiang/int_rerun/problems")
+                        default="/scratch/hdd001/home/ANON/int_rerun/problems")
     parser.add_argument('-k', type=int)
     parser.add_argument('-l', type=int)
     parser.add_argument('--degree', type=int, default=0)

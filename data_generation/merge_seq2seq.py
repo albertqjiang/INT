@@ -6,8 +6,8 @@ import random
 random.seed(213)
 
 parser = argparse.ArgumentParser(description='Mode generator')
-parser.add_argument('--path', '-p', default="/scratch/hdd001/home/ajiang/data/INT/seq")
-parser.add_argument('--output_path', '-op', default="/scratch/hdd001/home/ajiang/data/INT/seq/preprocessed")
+parser.add_argument('--path', '-p', default="/scratch/hdd001/home/ANON/data/INT/seq")
+parser.add_argument('--output_path', '-op', default="/scratch/hdd001/home/ANON/data/INT/seq/preprocessed")
 args = parser.parse_args()
 
 if not os.path.isdir(args.output_path):
