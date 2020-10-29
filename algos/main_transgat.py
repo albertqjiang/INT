@@ -72,6 +72,8 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--dump", required=True, type=str,
                         help="which mode of observation to use")
     parser.add_argument('-hd', '--hidden-dim', type=int, default=128, help="how many hidden dimensions")
+    parser.add_argument("-bs", "--batch-size", required=False, type=int, default=32,
+                        help="what batch size to use")
     args = parser.parse_args()
 
     options = dict(
