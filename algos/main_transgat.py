@@ -64,12 +64,13 @@ if __name__ == "__main__":
     parser.add_argument('--inception', type=int, default=3, help="how many intermediate layers")
     parser.add_argument("-d", "--dump", required=True, type=str,
                         help="which mode of observation to use")
+    parser.add_argument('-hd', '--hidden-dim', type=int, default=128, help="how many hidden dimensions")
     args = parser.parse_args()
 
     options = dict(
         num_nodes=len(nodename2index),
         num_lemmas=len(thm2index),
-        state_dim=args.state_dim,
+        state_dim=args.hidden_dim,
         inception=args.inception,
     )
     model = GATThmNet(**options)
