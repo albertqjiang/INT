@@ -70,7 +70,7 @@ if __name__ == "__main__":
     options = dict(
         num_nodes=len(nodename2index),
         num_lemmas=len(thm2index),
-        state_dim=args.hidden_dim,
+        hidden_dim=args.hidden_dim,
         inception=args.inception,
         entity_cost=args.entity_cost,
         lemma_cost=args.lemma_cost,
