@@ -35,8 +35,17 @@ def load_data(data_path):
         pickle.load(open(os.path.join(data_path, "train_problems.pkl"), "rb")), \
         pickle.load(open(os.path.join(data_path, "valid_problems.pkl"), "rb")), \
         pickle.load(open(os.path.join(data_path, "test_problems.pkl"), "rb"))
+    train_trajs = list()
+    for train_problem in train_problems:
+        train_trajs.extend(train_problem)
+    valid_trajs = list()
+    for valid_problem in valid_problems:
+        valid_trajs.extend(valid_problem)
+    test_trajs = list()
+    for test_problem in test_problems:
+        test_trajs.extend(test_problem)
     train_dataset, valid_dataset, test_dataset = \
-        Dataset(train_problems), Dataset(valid_problems), Dataset(test_problems)
+        Dataset(train_trajs), Dataset(valid_trajs), Dataset(test_trajs)
     return train_dataset, valid_dataset, test_dataset
 
 
