@@ -72,6 +72,8 @@ if __name__ == "__main__":
         num_lemmas=len(thm2index),
         state_dim=args.hidden_dim,
         inception=args.inception,
+        entity_cost=args.entity_cost,
+        lemma_cost=args.lemma_cost,
     )
     model = GATThmNet(**options)
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
