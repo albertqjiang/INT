@@ -35,10 +35,8 @@ def load_data(data_path):
         pickle.load(open(os.path.join(data_path, "train_problems.pkl"), "rb")), \
         pickle.load(open(os.path.join(data_path, "valid_problems.pkl"), "rb")), \
         pickle.load(open(os.path.join(data_path, "test_problems.pkl"), "rb"))
-    train_dataset, valid_dataset, test_dataset = Dataset([]), Dataset([]), Dataset([])
-    train_dataset.merge(train_problems)
-    valid_dataset.merge(valid_problems)
-    test_dataset.merge(test_problems)
+    train_dataset, valid_dataset, test_dataset = \
+        Dataset(train_problems), Dataset(valid_problems), Dataset(test_problems)
     return train_dataset, valid_dataset, test_dataset
 
 
