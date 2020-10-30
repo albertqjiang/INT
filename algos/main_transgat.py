@@ -16,6 +16,7 @@ from algos.lib.obs import nodename2index, thm2index, batch_process
 from data_generation.generate_problems import generate_multiple_problems
 from data_generation.utils import Dataset
 from TransGrapher.models.TransGAT import GATThmNet
+from algos.model.thm_model import ThmNet
 
 
 use_gpu = torch.cuda.is_available()
@@ -74,17 +75,38 @@ if __name__ == "__main__":
     parser.add_argument('-hd', '--hidden-dim', type=int, default=128, help="how many hidden dimensions")
     parser.add_argument("-bs", "--batch-size", required=False, type=int, default=32,
                         help="what batch size to use")
+    parser.add_argument("-gt", "--gnn-type", required=True, type=str,
+                        help="which type of gnn to use")
     args = parser.parse_args()
 
-    options = dict(
-        num_nodes=len(nodename2index),
-        num_lemmas=len(thm2index),
-        hidden_dim=args.hidden_dim,
-        inception=args.inception,
-        entity_cost=args.entity_cost,
-        lemma_cost=args.lemma_cost,
-    )
-    model = GATThmNet(**options)
+    if args.gnn_type == "transgat":
+        options = dict(
+            num_nodes=len(nodename2index),
+            num_lemmas=len(thm2index),
+            hidden_dim=args.hidden_dim,
+            inception=args.inception,
+            entity_cost=args.entity_cost,
+            lemma_cost=args.lemma_cost,
+        )
+        model = GATThmNet(**options)
+    elif args.gnn_type == "GIN":
+        options = dict(
+            num_nodes=len(nodename2index),
+            num_lemmas=len(thm2index),
+            state_dim=args.hidden_dim,
+            gnn_type=args.gnn_type,
+            combined_gt_obj=True,
+            attention_type=1,
+            hidden_layers=args.inception,
+            norm=None,
+            entity_cost=args.entity_cost,
+            lemma_cost=args.lemma_cost,
+            cuda=use_gpu
+        )
+        model = ThmNet(**options)
+    else:
+        raise NotImplementedError
+
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
     lr_scheduler = get_cosine_schedule_with_warmup(
         optimizer,
