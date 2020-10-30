@@ -94,15 +94,15 @@ if __name__ == "__main__":
     )
 
     updates = 0
-    minibatch = 0
-    total_loss = 0
-    total_lemma_acc = 0
-    total_ent_acc = 0
-    total_name_acc = 0
     train_lemma_accs, train_ent_accs, train_name_accs = list(), list(), list()
     valid_lemma_accs, valid_ent_accs, valid_name_accs = list(), list(), list()
     train_d, valid_d, test_d = load_data(args.data_path)
-    while True:
+    for epoch in range(10000):
+        minibatch = 0
+        total_loss = 0
+        total_lemma_acc = 0
+        total_ent_acc = 0
+        total_name_acc = 0
         sampler = data_handler.RandomSampler(train_d)
         batcher = data_handler.BatchSampler(sampler, batch_size=args.batch_size, drop_last=False)
         for indices in batcher:
@@ -123,21 +123,27 @@ if __name__ == "__main__":
             total_ent_acc += ent_acc.cpu().item()
             total_name_acc += name_acc.cpu().item()
 
-            train_lemma_accs.append(lemma_acc)
-            train_ent_accs.append(ent_acc)
-            train_name_accs.append(name_acc)
+        lemma_acc = total_lemma_acc / minibatch
+        ent_acc = total_ent_acc / minibatch
+        name_acc = total_name_acc / minibatch
+        train_lemma_accs.append(lemma_acc)
+        train_ent_accs.append(ent_acc)
+        train_name_accs.append(name_acc)
 
         valid_batch = valid_d.io_tuples
         valid_batch_states, valid_batch_actions, valid_batch_name_actions = \
             batch_process(valid_batch, mode=args.obs_mode)
         _, _, _, (valid_lemma_acc, valid_ent_acc, valid_name_acc, _, _) = \
             model.forward(valid_batch_states, valid_batch_actions)
-        valid_lemma_accs.append(valid_lemma_acc)
-        valid_ent_accs.append(valid_ent_acc)
-        valid_name_accs.append(valid_name_acc)
+        valid_lemma_accs.append(valid_lemma_acc.cpu().item())
+        valid_ent_accs.append(valid_ent_acc.cpu().item())
+        valid_name_accs.append(valid_name_acc.cpu().item())
 
         if updates > args.num_steps:
             break
+
+    if not os.path.isdir(args.dump):
+        os.makedirs(args.dump)
 
     json.dump(train_lemma_accs, open(os.path.join(args.dump, "train_lemma_accs.json"), "w"))
     json.dump(train_ent_accs, open(os.path.join(args.dump, "train_ent_accs.json"), "w"))
