@@ -15,7 +15,7 @@ from algos.eval import eval_agent
 from algos.lib.obs import nodename2index, thm2index, batch_process
 from data_generation.generate_problems import generate_multiple_problems
 from data_generation.utils import Dataset
-from TransGrapher.models.TransGAT import GATThmNet
+from TransGrapher.models.TransGAT import TransGATThmNet
 from algos.model.thm_model import ThmNet
 
 
@@ -77,6 +77,8 @@ if __name__ == "__main__":
                         help="what batch size to use")
     parser.add_argument("-gt", "--gnn-type", required=True, type=str,
                         help="which type of gnn to use")
+    parser.add_argument("-et", "--encoder-type", required=False, type=str, default="transgat",
+                        help="which type of gnn to use")
     args = parser.parse_args()
 
     if args.gnn_type == "transgat":
@@ -87,8 +89,9 @@ if __name__ == "__main__":
             inception=args.inception,
             entity_cost=args.entity_cost,
             lemma_cost=args.lemma_cost,
+            encoder_type=args.encoder_type
         )
-        model = GATThmNet(**options)
+        model = TransGATThmNet(**options)
     elif args.gnn_type == "GIN":
         options = dict(
             num_nodes=len(nodename2index),
