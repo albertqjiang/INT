@@ -115,6 +115,9 @@ if __name__ == "__main__":
         num_cycles=args.cycles
     )
 
+    if not os.path.isdir(args.dump):
+        os.makedirs(args.dump)
+
     updates = 0
     train_lemma_accs, train_ent_accs, train_name_accs = list(), list(), list()
     valid_lemma_accs, valid_ent_accs, valid_name_accs = list(), list(), list()
@@ -161,18 +164,13 @@ if __name__ == "__main__":
         valid_ent_accs.append(valid_ent_acc.cpu().item())
         valid_name_accs.append(valid_name_acc.cpu().item())
 
+        torch.save(model, os.path.join(args.dump, "model.pt"))
+        json.dump(train_lemma_accs, open(os.path.join(args.dump, "train_lemma_accs.json"), "w"))
+        json.dump(train_ent_accs, open(os.path.join(args.dump, "train_ent_accs.json"), "w"))
+        json.dump(train_name_accs, open(os.path.join(args.dump, "train_name_accs.json"), "w"))
+        json.dump(valid_lemma_accs, open(os.path.join(args.dump, "valid_lemma_accs.json"), "w"))
+        json.dump(valid_ent_accs, open(os.path.join(args.dump, "valid_ent_accs.json"), "w"))
+        json.dump(valid_name_accs, open(os.path.join(args.dump, "valid_name_accs.json"), "w"))
+
         if updates > args.num_steps:
             break
-
-    if not os.path.isdir(args.dump):
-        os.makedirs(args.dump)
-
-    json.dump(train_lemma_accs, open(os.path.join(args.dump, "train_lemma_accs.json"), "w"))
-    json.dump(train_ent_accs, open(os.path.join(args.dump, "train_ent_accs.json"), "w"))
-    json.dump(train_name_accs, open(os.path.join(args.dump, "train_name_accs.json"), "w"))
-    json.dump(valid_lemma_accs, open(os.path.join(args.dump, "valid_lemma_accs.json"), "w"))
-    json.dump(valid_ent_accs, open(os.path.join(args.dump, "valid_ent_accs.json"), "w"))
-    json.dump(valid_name_accs, open(os.path.join(args.dump, "valid_name_accs.json"), "w"))
-
-
-
