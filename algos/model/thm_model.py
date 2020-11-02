@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from algos.model.gnns import GraphEncoder, GraphTransformingEncoder, GraphIsomorphismEncoder, FCResBlock
+from algos.model.gnns import TransGATEncoder, GraphEncoder, GraphTransformingEncoder, GraphIsomorphismEncoder, FCResBlock
 from algos.lib.ops import one_hot, graph_softmax
 from algos.lib.obs import tile_obs_acs, thm2index, compute_mask, compute_trans_ind, theorem_no_input, index2thm, \
     thm_index2no_input, convert_obs_to_dict
@@ -45,12 +45,13 @@ class GroundTruthEncoder(torch.nn.Module):
         elif gnn_type == "GIN":
             self.graph_encoder = GraphIsomorphismEncoder(
                 num_in, num_out, nn_dim=conv_dim, hidden_layers=hidden_layers, norm=norm)
-
         elif gnn_type == "GICN":
             self.graph_encoder1 = GraphIsomorphismEncoder(
                 num_in, num_out, nn_dim=conv_dim, hidden_layers=hidden_layers, norm=norm)
             self.graph_encoder2 = GraphEncoder(
                 num_in, num_out, conv_dim=conv_dim, hidden_layers=hidden_layers, norm=norm)
+        elif gnn_type == "TransGAT":
+            self.graph_encoder = TransGATEncoder(input_dim=num_in, hidden_dim=num_out)
         else:
             raise NotImplementedError
         self.to(device)
@@ -92,7 +93,7 @@ class ThmNet(torch.nn.Module):
         attention_type = options["attention_type"]
         hidden_layers = options["hidden_layers"]
         self.entity_cost = options["entity_cost"]
-        self.lemma_cost= options["lemma_cost"]
+        self.lemma_cost = options["lemma_cost"]
         norm = options["norm"]
 
         self.attention_type = attention_type
