@@ -129,12 +129,16 @@ if __name__ == "__main__":
         model.load_state_dict(load_dict['model_state_dict'])
         optimizer.load_state_dict(load_dict['optimizer_state_dict'])
         lr_scheduler.load_state_dict(load_dict['lr_scheduler_state_dict'])
+        train_lemma_accs = json.load(open(os.path.join(args.dump, "train_lemma_accs.json"), "r"))
+        train_ent_accs = json.load(open(os.path.join(args.dump, "train_ent_accs.json"), "r"))
+        valid_lemma_accs = json.load(open(os.path.join(args.dump, "valid_lemma_accs.json"), "r"))
+        valid_ent_accs = json.load(open(os.path.join(args.dump, "valid_ent_accs.json"), "r"))
     else:
         epoch = 0
         updates = 0
+        train_lemma_accs, train_ent_accs = list(), list()
+        valid_lemma_accs, valid_ent_accs = list(), list()
 
-    train_lemma_accs, train_ent_accs, train_name_accs = list(), list(), list()
-    valid_lemma_accs, valid_ent_accs, valid_name_accs = list(), list(), list()
     train_d, valid_d, test_d = load_data(args.data_path)
     while epoch < 100000:
         minibatch = 0
@@ -167,7 +171,6 @@ if __name__ == "__main__":
         name_acc = total_name_acc / minibatch
         train_lemma_accs.append(lemma_acc)
         train_ent_accs.append(ent_acc)
-        train_name_accs.append(name_acc)
 
         valid_batch = valid_d.io_tuples
         valid_batch_states, valid_batch_actions, valid_batch_name_actions = \
@@ -176,7 +179,6 @@ if __name__ == "__main__":
             model.forward(valid_batch_states, valid_batch_actions)
         valid_lemma_accs.append(valid_lemma_acc.cpu().item())
         valid_ent_accs.append(valid_ent_acc.cpu().item())
-        valid_name_accs.append(valid_name_acc.cpu().item())
 
         save_dict = {
             'epoch': epoch,
@@ -189,10 +191,8 @@ if __name__ == "__main__":
         torch.save(save_dict, load_dict_path)
         json.dump(train_lemma_accs, open(os.path.join(args.dump, "train_lemma_accs.json"), "w"))
         json.dump(train_ent_accs, open(os.path.join(args.dump, "train_ent_accs.json"), "w"))
-        json.dump(train_name_accs, open(os.path.join(args.dump, "train_name_accs.json"), "w"))
         json.dump(valid_lemma_accs, open(os.path.join(args.dump, "valid_lemma_accs.json"), "w"))
         json.dump(valid_ent_accs, open(os.path.join(args.dump, "valid_ent_accs.json"), "w"))
-        json.dump(valid_name_accs, open(os.path.join(args.dump, "valid_name_accs.json"), "w"))
 
         if updates > args.num_steps:
             break
