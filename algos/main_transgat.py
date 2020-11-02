@@ -86,36 +86,23 @@ if __name__ == "__main__":
     if not os.path.isdir(args.dump):
         os.makedirs(args.dump)
 
-    if args.gnn_type == "transgat":
-        options = dict(
-            num_nodes=len(nodename2index),
-            num_lemmas=len(thm2index),
-            hidden_dim=args.hidden_dim,
-            inception=args.inception,
-            entity_cost=args.entity_cost,
-            lemma_cost=args.lemma_cost,
-            encoder_type=args.encoder_type,
-            gat_dropout_rate=args.gat_dropout_rate,
-            dropout_rate=args.dropout_rate
-        )
-        model = TransGATThmNet(**options)
-    elif args.gnn_type == "GIN":
-        options = dict(
-            num_nodes=len(nodename2index),
-            num_lemmas=len(thm2index),
-            state_dim=args.hidden_dim,
-            gnn_type=args.gnn_type,
-            combined_gt_obj=True,
-            attention_type=1,
-            hidden_layers=args.inception,
-            norm=None,
-            entity_cost=args.entity_cost,
-            lemma_cost=args.lemma_cost,
-            cuda=use_gpu
-        )
-        model = ThmNet(**options)
-    else:
-        raise NotImplementedError
+    options = dict(
+        num_nodes=len(nodename2index),
+        num_lemmas=len(thm2index),
+        state_dim=args.hidden_dim,
+        gnn_type=args.gnn_type,
+        combined_gt_obj=True,
+        attention_type=1,
+        hidden_layers=args.inception,
+        norm=None,
+        entity_cost=args.entity_cost,
+        lemma_cost=args.lemma_cost,
+        cuda=use_gpu,
+        inception=args.inception,
+        gat_dropout_rate=args.gat_dropout_rate,
+        dropout_rate=args.dropout_rate
+    )
+    model = ThmNet(**options)
 
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
     lr_scheduler = get_cosine_schedule_with_warmup(
