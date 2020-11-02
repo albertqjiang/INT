@@ -65,7 +65,7 @@ if __name__ == "__main__":
                         help="learning rate")
     parser.add_argument('-wp', '--warmup-percentage', type=float, default=0.1,
                         help="the proportion of warmup updates")
-    parser.add_argument('-c', '--cycles', type=float, default=2.5, help="how many cycles")
+    parser.add_argument('-c', '--cycles', type=float, default=0.5, help="how many cycles")
     parser.add_argument('-ns', '--num-steps', type=int, default=3000, help="how many steps")
     parser.add_argument("-o", "--obs_mode", required=False, type=str, default="geometric",
                         help="which mode of observation to use")
@@ -80,6 +80,9 @@ if __name__ == "__main__":
     parser.add_argument("-et", "--encoder-type", required=False, type=str, default="transgat",
                         help="which type of gnn to use")
     args = parser.parse_args()
+
+    if not os.path.isdir(args.dump):
+        os.makedirs(args.dump)
 
     if args.gnn_type == "transgat":
         options = dict(
@@ -118,14 +121,22 @@ if __name__ == "__main__":
         num_cycles=args.cycles
     )
 
-    if not os.path.isdir(args.dump):
-        os.makedirs(args.dump)
+    load_dict_path = os.path.join(args.dump, "last_epoch.pt")
+    if os.path.isfile(load_dict_path):
+        load_dict = torch.load(load_dict_path)
+        epoch = load_dict['epoch']
+        updates = load_dict['epoch']
+        model.load_state_dict(load_dict['model_state_dict'])
+        optimizer.load_state_dict(load_dict['optimizer_state_dict'])
+        lr_scheduler.load_state_dict(load_dict['lr_scheduler_state_dict'])
+    else:
+        epoch = 0
+        updates = 0
 
-    updates = 0
     train_lemma_accs, train_ent_accs, train_name_accs = list(), list(), list()
     valid_lemma_accs, valid_ent_accs, valid_name_accs = list(), list(), list()
     train_d, valid_d, test_d = load_data(args.data_path)
-    for epoch in range(10000):
+    while epoch < 100000:
         minibatch = 0
         total_loss = 0
         total_lemma_acc = 0
@@ -167,7 +178,15 @@ if __name__ == "__main__":
         valid_ent_accs.append(valid_ent_acc.cpu().item())
         valid_name_accs.append(valid_name_acc.cpu().item())
 
-        torch.save(model, os.path.join(args.dump, "model.pt"))
+        save_dict = {
+            'epoch': epoch,
+            'updates': updates,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'lr_scheduler_state_dict': lr_scheduler.state_dict(),
+        }
+
+        torch.save(save_dict, load_dict_path)
         json.dump(train_lemma_accs, open(os.path.join(args.dump, "train_lemma_accs.json"), "w"))
         json.dump(train_ent_accs, open(os.path.join(args.dump, "train_ent_accs.json"), "w"))
         json.dump(train_name_accs, open(os.path.join(args.dump, "train_name_accs.json"), "w"))
