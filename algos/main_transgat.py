@@ -79,6 +79,8 @@ if __name__ == "__main__":
                         help="which type of gnn to use")
     parser.add_argument("-et", "--encoder-type", required=False, type=str, default="transgat",
                         help="which type of gnn to use")
+    parser.add_argument('-gdr', '--gat-dropout-rate', type=float, default=0.1, help="gat dropout rate")
+    parser.add_argument('-dr', '--dropout-rate', type=float, default=0.1, help="dropout rate")
     args = parser.parse_args()
 
     if not os.path.isdir(args.dump):
@@ -92,7 +94,9 @@ if __name__ == "__main__":
             inception=args.inception,
             entity_cost=args.entity_cost,
             lemma_cost=args.lemma_cost,
-            encoder_type=args.encoder_type
+            encoder_type=args.encoder_type,
+            gat_dropout_rate=args.gat_dropout_rate,
+            dropout_rate=args.dropout_rate
         )
         model = TransGATThmNet(**options)
     elif args.gnn_type == "GIN":
