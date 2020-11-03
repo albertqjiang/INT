@@ -81,6 +81,8 @@ if __name__ == "__main__":
                         help="which type of gnn to use")
     parser.add_argument('-gdr', '--gat-dropout-rate', type=float, default=0.1, help="gat dropout rate")
     parser.add_argument('-dr', '--dropout-rate', type=float, default=0.1, help="dropout rate")
+    parser.add_argument("-ah", "--attention-heads", required=False, type=int, default=8,
+                        help="how many attention heads to use")
     args = parser.parse_args()
 
     if not os.path.isdir(args.dump):
@@ -89,7 +91,7 @@ if __name__ == "__main__":
     options = dict(
         num_nodes=len(nodename2index),
         num_lemmas=len(thm2index),
-        state_dim=args.hidden_dim,
+        hidden_dim=args.hidden_dim,
         gnn_type=args.gnn_type,
         combined_gt_obj=True,
         attention_type=1,
@@ -100,7 +102,8 @@ if __name__ == "__main__":
         cuda=use_gpu,
         inception=args.inception,
         gat_dropout_rate=args.gat_dropout_rate,
-        dropout_rate=args.dropout_rate
+        dropout_rate=args.dropout_rate,
+        attention_heads=args.attention_heads
     )
     model = ThmNet(**options)
 
