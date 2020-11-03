@@ -108,12 +108,13 @@ class ThmNet(torch.nn.Module):
         #     combined_gt_obj = False
         # else:
         self.gt_encoder = GroundTruthEncoder(num_nodes + 4, hidden_dim, hidden_dim,
-                                             gnn_type=gnn_type, hidden_layers=hidden_layers, norm=norm,
+                                             # gnn_type=gnn_type, hidden_layers=hidden_layers, norm=norm,
                                              **options)
         self.combined_gt_obj = combined_gt_obj
         if not combined_gt_obj:
             self.obj_encoder = GroundTruthEncoder(num_nodes + 4, hidden_dim, hidden_dim,
-                                                  gnn_type=gnn_type, hidden_layers=hidden_layers, norm=norm)
+                                                  # gnn_type=gnn_type, hidden_layers=hidden_layers, norm=norm,
+                                                  **options)
         else:
             self.obj_encoder = self.gt_encoder
         self.lemma_encoder = nn.Linear(num_lemmas, 2*hidden_dim)
