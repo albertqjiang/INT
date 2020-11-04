@@ -65,7 +65,7 @@ def get_args():
     # neural architecture hps
     parser.add_argument("-hi", "--hidden", required=False, default=6, type=int,
                         help="how many hidden layers of nn")
-    parser.add_argument("-sd", "--state_dim", required=False, type=int, default=512,
+    parser.add_argument("-hd", "--hidden_dim", required=False, type=int, default=512,
                         help="what state dimension to use")
     parser.add_argument("-gt", "--gnn_type", required=False, type=str, default="GIN",
                         help="what type of GNN to use")
