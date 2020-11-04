@@ -251,6 +251,26 @@ class GraphTransformingEncoder(nn.Module):
         return x
 
 
+class RawGATEncoder(nn.Module):
+    def __init__(self, num_in, num_out, conv_dim=64, heads=1, hidden_layers=1, norm=None):
+        super(RawGATEncoder, self).__init__()
+        self.hidden_layers = hidden_layers
+        self.conv_in = GATConv(num_in, conv_dim, heads=heads)
+        self.hidden_convs = nn.ModuleList([
+            GATConv(heads * conv_dim, conv_dim, heads=heads) for _ in range(self.hidden_layers)
+        ])
+        self.conv_out = GATConv(heads * conv_dim, int(num_out / heads), heads=heads)
+        self.to(device)
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+        x = F.relu(self.conv_in(x, edge_index))
+        for i in range(self.hidden_layers):
+            x = F.relu(self.hidden_convs[i](x, edge_index))
+        x = self.conv_out(x, edge_index)
+        return x
+
+
 class TransGATEncoder(torch.nn.Module):
     def __init__(self, input_dim, inception=5, hidden_dim=64, heads=8, gat_dropout_rate=0.1, dropout_rate=0.1):
         super(TransGATEncoder, self).__init__()

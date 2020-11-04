@@ -6,7 +6,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from algos.model.gnns import TransGATEncoder, GraphEncoder, GraphTransformingEncoder, GraphIsomorphismEncoder, FCResBlock
+from algos.model.gnns import TransGATEncoder, GraphEncoder, GraphTransformingEncoder, GraphIsomorphismEncoder,\
+    FCResBlock, RawGATEncoder
 from algos.lib.ops import one_hot, graph_softmax
 from algos.lib.obs import tile_obs_acs, thm2index, compute_mask, compute_trans_ind, theorem_no_input, index2thm, \
     thm_index2no_input, convert_obs_to_dict
@@ -56,6 +57,9 @@ class GroundTruthEncoder(torch.nn.Module):
                                                  heads=options["attention_heads"],
                                                  gat_dropout_rate=options["gat_dropout_rate"],
                                                  dropout_rate=options["dropout_rate"])
+        elif gnn_type == "RawGAT":
+            self.graph_encoder = RawGATEncoder(num_in=num_in, hidden_layers=hidden_layers,
+                                               num_out=num_out, heads=options["attention_heads"])
         else:
             raise NotImplementedError
         self.to(device)
