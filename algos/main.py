@@ -143,7 +143,10 @@ def load_model():
         norm=args.norm,
         entity_cost=args.entity_cost,
         lemma_cost=args.lemma_cost,
-        cuda=args.use_gpu
+        cuda=args.use_gpu,
+        attention_heads=args.attention_heads,
+        gat_dropout_rate=args.gat_dropout_rate,
+        dropout_rate=args.dropout_rate,
     )
     return ThmNet(**options)
 
