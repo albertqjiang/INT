@@ -135,7 +135,7 @@ def load_model():
     options = dict(
         num_nodes=len(nodename2index),
         num_lemmas=len(thm2index),
-        state_dim=args.hidden_dim,
+        hidden_dim=args.hidden_dim,
         gnn_type=args.gnn_type,
         combined_gt_obj=args.combined_gt_obj,
         attention_type=args.atten_type,
