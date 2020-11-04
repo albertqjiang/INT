@@ -54,7 +54,7 @@ if args.use_gpu:
 random.seed(args.seed)
 np.random.seed(args.seed)
 
-os.mkdir(os.path.join(args.dump, str(timestamp)))
+os.makedirs(os.path.join(args.dump, str(timestamp)))
 
 
 def load_checkpoint(model, optimizer, filename):
