@@ -52,7 +52,7 @@ and train 10 epochs on them before generating a new set of problems.
 The training results and models are dumped in directory `data/pt_models`.
 ```bash
 mkdir data/pt_models
-python algos/main.py -cp data/benchmark/field -du data/pt_models/ --online -trs k\=5_l\=5 -tes k\=5_l\=5 -epod 10 -np 1000 --atten_type 1 --lr 1e-4 -u 1000000 -tg --degree 0 --seed 0
+python algos/main.py -cp data/benchmark/field -du data/pt_models/ --online -trs k\=5_l\=5 -tes k\=5_l\=5 -epod 10 -np 1000 --lr 1e-4 -u 1000000 -tg --degree 0 --seed 0
 ```
 
 ## Documentation for important functions and classes
