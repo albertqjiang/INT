@@ -54,7 +54,7 @@ if args.use_gpu:
 random.seed(args.seed)
 np.random.seed(args.seed)
 
-os.mkdir(os.path.join(args.dump, str(timestamp)))
+os.makedirs(os.path.join(args.dump, str(timestamp)))
 
 
 def load_checkpoint(model, optimizer, filename):
@@ -135,7 +135,7 @@ def load_model():
     options = dict(
         num_nodes=len(nodename2index),
         num_lemmas=len(thm2index),
-        state_dim=args.state_dim,
+        hidden_dim=args.hidden_dim,
         gnn_type=args.gnn_type,
         combined_gt_obj=args.combined_gt_obj,
         attention_type=args.atten_type,
@@ -143,7 +143,10 @@ def load_model():
         norm=args.norm,
         entity_cost=args.entity_cost,
         lemma_cost=args.lemma_cost,
-        cuda=args.use_gpu
+        cuda=args.use_gpu,
+        attention_heads=args.attention_heads,
+        gat_dropout_rate=args.gat_dropout_rate,
+        dropout_rate=args.dropout_rate,
     )
     return ThmNet(**options)
 

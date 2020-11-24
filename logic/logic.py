@@ -123,6 +123,9 @@ class LogicStatement:
         self.name = (self.logic_function.name +
                      " ( " + " , ".join([inp.to_string() for inp in self.operands]) + " )")
 
+    def to_string(self):
+        return self.name
+
 
 class Theorem:
     theorem_count = 0

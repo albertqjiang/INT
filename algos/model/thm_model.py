@@ -6,7 +6,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from algos.model.gnns import GraphEncoder, GraphTransformingEncoder, GraphIsomorphismEncoder, FCResBlock
+from algos.model.gnns import TransGATEncoder, GraphEncoder, GraphTransformingEncoder, GraphIsomorphismEncoder,\
+    FCResBlock, RawGATEncoder
 from algos.lib.ops import one_hot, graph_softmax
 from algos.lib.obs import tile_obs_acs, thm2index, compute_mask, compute_trans_ind, theorem_no_input, index2thm, \
     thm_index2no_input, convert_obs_to_dict
@@ -31,7 +32,8 @@ np.random.seed(0)
 
 
 class GroundTruthEncoder(torch.nn.Module):
-    def __init__(self, num_in, num_out, conv_dim=64, gnn_type="GAT", hidden_layers=1, norm=None):
+    def __init__(self, num_in, num_out, conv_dim=64, gnn_type="GAT", hidden_layers=1, norm=None,
+                 **options):
         super(GroundTruthEncoder, self).__init__()
 
         self.gnn_type = gnn_type
@@ -45,12 +47,19 @@ class GroundTruthEncoder(torch.nn.Module):
         elif gnn_type == "GIN":
             self.graph_encoder = GraphIsomorphismEncoder(
                 num_in, num_out, nn_dim=conv_dim, hidden_layers=hidden_layers, norm=norm)
-
         elif gnn_type == "GICN":
             self.graph_encoder1 = GraphIsomorphismEncoder(
                 num_in, num_out, nn_dim=conv_dim, hidden_layers=hidden_layers, norm=norm)
             self.graph_encoder2 = GraphEncoder(
                 num_in, num_out, conv_dim=conv_dim, hidden_layers=hidden_layers, norm=norm)
+        elif gnn_type == "TransGAT":
+            self.graph_encoder = TransGATEncoder(input_dim=num_in, hidden_dim=num_out, inception=hidden_layers,
+                                                 heads=options["attention_heads"],
+                                                 gat_dropout_rate=options["gat_dropout_rate"],
+                                                 dropout_rate=options["dropout_rate"])
+        elif gnn_type == "RawGAT":
+            self.graph_encoder = RawGATEncoder(num_in=num_in, hidden_layers=hidden_layers,
+                                               num_out=num_out, heads=options["attention_heads"])
         else:
             raise NotImplementedError
         self.to(device)
@@ -83,55 +92,56 @@ class ThmNet(torch.nn.Module):
 
     def __init__(self, **options):
         super().__init__()
-        self.device = torch.device("cuda:0" if options["cuda"] else "cpu")
         num_nodes = options["num_nodes"]
         num_lemmas = options["num_lemmas"]
-        state_dim = options["state_dim"]
+        hidden_dim = options["hidden_dim"]
         gnn_type = options["gnn_type"]
         combined_gt_obj = options["combined_gt_obj"]
         attention_type = options["attention_type"]
         hidden_layers = options["hidden_layers"]
         self.entity_cost = options["entity_cost"]
-        self.lemma_cost= options["lemma_cost"]
+        self.lemma_cost = options["lemma_cost"]
         norm = options["norm"]
 
         self.attention_type = attention_type
         assert attention_type is not None
-        if attention_type == 2:
-            self.gt_encoder = GroundTruthEncoder(num_nodes + 4, state_dim, state_dim,
-                                                 gnn_type=gnn_type, hidden_layers=hidden_layers, norm=norm,
-                                                 prop_attention=True)
-            combined_gt_obj = False
-        else:
-            self.gt_encoder = GroundTruthEncoder(num_nodes + 4, state_dim, state_dim,
-                                                 gnn_type=gnn_type, hidden_layers=hidden_layers, norm=norm)
+        # if attention_type == 2:
+        #     self.gt_encoder = GroundTruthEncoder(num_nodes + 4, hidden_dim, hidden_dim,
+        #                                          gnn_type=gnn_type, hidden_layers=hidden_layers, norm=norm,
+        #                                          prop_attention=True)
+        #     combined_gt_obj = False
+        # else:
+        self.gt_encoder = GroundTruthEncoder(num_nodes + 4, hidden_dim, hidden_dim,
+                                             # gnn_type=gnn_type, hidden_layers=hidden_layers, norm=norm,
+                                             **options)
         self.combined_gt_obj = combined_gt_obj
         if not combined_gt_obj:
-            self.obj_encoder = GroundTruthEncoder(num_nodes + 4, state_dim, state_dim,
-                                                  gnn_type=gnn_type, hidden_layers=hidden_layers, norm=norm)
+            self.obj_encoder = GroundTruthEncoder(num_nodes + 4, hidden_dim, hidden_dim,
+                                                  # gnn_type=gnn_type, hidden_layers=hidden_layers, norm=norm,
+                                                  **options)
         else:
             self.obj_encoder = self.gt_encoder
-        self.lemma_encoder = nn.Linear(num_lemmas, 2*state_dim)
-        self.key_transform = nn.Linear(2*state_dim, state_dim, bias=False)
-        self.ent_transform = nn.Linear(state_dim, 2*state_dim, bias=False)
-        self.gt_ent_transform = nn.Linear(state_dim, state_dim, bias=False)
-        self.obj_ent_transform = nn.Linear(state_dim, state_dim, bias=False)
+        self.lemma_encoder = nn.Linear(num_lemmas, 2*hidden_dim)
+        self.key_transform = nn.Linear(2*hidden_dim, hidden_dim, bias=False)
+        self.ent_transform = nn.Linear(hidden_dim, 2*hidden_dim, bias=False)
+        self.gt_ent_transform = nn.Linear(hidden_dim, hidden_dim, bias=False)
+        self.obj_ent_transform = nn.Linear(hidden_dim, hidden_dim, bias=False)
         # self.lemma_q = nn.Sequential(
-        #     nn.Linear(2*state_dim, state_dim),
+        #     nn.Linear(2*hidden_dim, hidden_dim),
         #     nn.ReLU(inplace=True),
-        #     nn.Linear(state_dim, num_lemmas))
-        self.lemma_q = FCResBlock(2*state_dim)
-        self.lemma_out = nn.Linear(2*state_dim, num_lemmas)
+        #     nn.Linear(hidden_dim, num_lemmas))
+        self.lemma_q = FCResBlock(2*hidden_dim)
+        self.lemma_out = nn.Linear(2*hidden_dim, num_lemmas)
         self.vf_net = nn.Sequential(
-            nn.Linear(2 * state_dim, state_dim),
+            nn.Linear(2 * hidden_dim, hidden_dim),
             nn.ReLU(inplace=True),
-            nn.Linear(state_dim, 1),
+            nn.Linear(hidden_dim, 1),
             nn.Sigmoid(),
         )
         self.entity_q = nn.Sequential(
-            nn.Linear(state_dim, state_dim),
+            nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(inplace=True),
-            nn.Linear(state_dim, 1))
+            nn.Linear(hidden_dim, 1))
         self.softmax = nn.Softmax(dim=1)
         self.to(device)
 

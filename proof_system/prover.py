@@ -1,4 +1,5 @@
 from proof_system.logic_functions import necessary_logic_functions
+from proof_system.graph_seq_conversion import Parser
 
 
 class Prover:
@@ -35,6 +36,8 @@ class Prover:
         self.objective_ids = self.add_logic_statements(self.objectives)
 
         self.update_conditions()
+
+        self.parser = Parser()
 
     @staticmethod
     def _trivial(logic_statement):
@@ -238,6 +241,10 @@ class Prover:
             "conclusion_ids": conclusion_ids,
             "progress": progress
         }
+
+    def apply_theorem_seq_style(self, exec_seq):
+        lemma, input_entities = self.parser.find_action(self.get_observation(), exec_seq)
+        return self.apply_theorem(lemma, input_entities)
 
     def is_proved(self):
         if self.prove_direction == "forward":

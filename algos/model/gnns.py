@@ -251,6 +251,71 @@ class GraphTransformingEncoder(nn.Module):
         return x
 
 
+class RawGATEncoder(nn.Module):
+    def __init__(self, num_in, num_out, conv_dim=64, heads=1, hidden_layers=1, norm=None):
+        super(RawGATEncoder, self).__init__()
+        self.hidden_layers = hidden_layers
+        self.conv_in = GATConv(num_in, conv_dim, heads=heads)
+        self.hidden_convs = nn.ModuleList([
+            GATConv(heads * conv_dim, conv_dim, heads=heads) for _ in range(self.hidden_layers)
+        ])
+        self.conv_out = GATConv(heads * conv_dim, int(num_out / heads), heads=heads)
+        self.to(device)
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+        x = F.relu(self.conv_in(x, edge_index))
+        for i in range(self.hidden_layers):
+            x = F.relu(self.hidden_convs[i](x, edge_index))
+        x = self.conv_out(x, edge_index)
+        return x
+
+
+class TransGATEncoder(torch.nn.Module):
+    def __init__(self, input_dim, inception=5, hidden_dim=64, heads=8, gat_dropout_rate=0.1, dropout_rate=0.1):
+        super(TransGATEncoder, self).__init__()
+        self.inception = inception
+        self.hidden_dim = hidden_dim
+        self.heads = heads
+        self.dim_per_head = int(hidden_dim / heads)
+        self.gat_dropout_rate = gat_dropout_rate
+        self.dropout_rate = dropout_rate
+
+        self.conv1 = GATConv(input_dim, self.dim_per_head, heads=self.heads, dropout=self.gat_dropout_rate)
+        self.convs = nn.ModuleList(
+            [GATConv(self.hidden_dim, self.dim_per_head, heads=self.heads, dropout=self.gat_dropout_rate) for _ in
+             range(self.inception)])
+        self.conv_out = GATConv(self.hidden_dim, self.hidden_dim, heads=1, dropout=self.gat_dropout_rate, concat=False)
+        self.norms = nn.ModuleList([nn.LayerNorm(self.hidden_dim) for _ in range(self.inception)])
+        self.fcs = nn.ModuleList([
+            nn.Sequential(
+                nn.Linear(self.hidden_dim, self.hidden_dim),
+                nn.ReLU(),
+                nn.Dropout(p=self.dropout_rate),
+                nn.Linear(self.hidden_dim, self.hidden_dim),
+                nn.Dropout(p=self.dropout_rate),
+            )
+
+            for _ in range(self.inception)])
+        self.fc_norms = nn.ModuleList([nn.LayerNorm(self.hidden_dim) for _ in range(self.inception)])
+        self.to(device)
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+        x = F.dropout(x, p=self.dropout_rate, training=self.training)
+        x = F.elu(self.conv1(x, edge_index))
+        x = F.dropout(x, p=self.dropout_rate, training=self.training)
+
+        for i in range(self.inception):
+            x1 = self.convs[i](x, edge_index)
+            x1 = F.elu(x1)
+            x1 = F.dropout(x1, p=self.dropout_rate, training=self.training)
+            x = self.norms[i](x + x1)
+            x1 = self.fcs[i](x)
+            x = self.fc_norms[i](x + x1)
+        return x
+
+
 class FCResBlock(nn.Module):
     def __init__(self, nn_dim, use_layer_norm=True):
         self.use_layer_norm = use_layer_norm

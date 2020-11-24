@@ -136,6 +136,8 @@ if __name__ == "__main__":
         args.online_order_generation, args.train_test, args.num_order_or_combo, args.degree,
         args.last_num_order_or_combo)
                              )
+    if not os.path.isdir(args.dump):
+        os.makedirs(args.dump)
     if os.path.isfile(data_path):
         eval_dataset = pickle.load(open(data_path, "rb"))
     else:
@@ -195,5 +197,6 @@ if __name__ == "__main__":
                         ans_path = os.path.join(args.dump, "{}avg_num_steps.json".format(prefix))
 
                         first_step_success_rate, _, _, avg_num_steps = test_rollout(model, eval_dataset)
+
                         json.dump(first_step_success_rate, open(sr_path, "w"))
                         json.dump(avg_num_steps, open(ans_path, "w"))

@@ -61,16 +61,22 @@ def get_args():
                         help="lemma cost")
     parser.add_argument("-ent", "--entity_cost", required=False, type=float, default=1.0,
                         help="entity cost")
+    parser.add_argument("-dr", "--dropout_rate", required=False, type=float, default=0.0,
+                        help="dropout rate")
+    parser.add_argument("-gdr", "--gat_dropout_rate", required=False, type=float, default=0.0,
+                        help="dropout rate in gat")
 
     # neural architecture hps
     parser.add_argument("-hi", "--hidden", required=False, default=6, type=int,
                         help="how many hidden layers of nn")
-    parser.add_argument("-sd", "--state_dim", required=False, type=int, default=512,
+    parser.add_argument("-hd", "--hidden_dim", required=False, type=int, default=512,
                         help="what state dimension to use")
     parser.add_argument("-gt", "--gnn_type", required=False, type=str, default="GIN",
                         help="what type of GNN to use")
     parser.add_argument("-atten", "--atten_type", type=int, required=False, default=0,
                         help="attention type")
+    parser.add_argument("-ah", "--attention_heads", type=int, required=False, default=8,
+                        help="attention heads")
     parser.add_argument("-n", "--norm", required=False, type=str, default=None,
                         help="what norm to use")
     # TODO: change this boolean arugment to be false
