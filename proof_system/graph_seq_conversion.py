@@ -39,6 +39,15 @@ class Parser:
         return output_string
 
     @staticmethod
+    def seq_string_chared(seq_string):
+        # Split sequence strings to individual characters and replace space with <space>
+        seq_elements = seq_string.split()
+        for i in range(len(seq_elements)):
+            element = seq_elements[i]
+            seq_elements[i] = " ".join([ch for ch in element])
+        return " <space> ".join(seq_elements)
+
+    @staticmethod
     def index_entity_by_name_in_root(entity):
         root = entity.root
         index = 0

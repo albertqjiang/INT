@@ -120,7 +120,7 @@ class Prover:
 
     def get_entities(self):
         # Get all the entities in the prover ever registered
-        return list(self.ent_ent2id.values())
+        return list(self.ent_id2ent.values())
 
     def get_ground_truth(self):
         # Get all the ground truth in the prover ever registered,

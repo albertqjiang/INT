@@ -250,15 +250,50 @@ def generate_problem(num_axioms, length, train_test, **kwargs):
         forward_steps = get_a_forward_problem(atom_ents, prover, axiom_order, **kwargs)
         if forward_steps is None:
             continue
-
         try:
-            # TODO: Temporary fix, need to investigate
             # Convert the proof to backward and validate it
-            returned_steps = generate_valid_steps(forward_to_backward(forward_steps))
+            returned_steps = generate_valid_steps(forward_to_backward(forward_steps),
+                                                  noisy=kwargs.get("noisy", False), p=kwargs.get("p", 0.5))
         except TypeError:
             continue
         # Check if the proof generated satisfies the specifications given
         if not proof_agrees_with_specs(returned_steps, length, axiom_order, avoid_objective_names):
+            continue
+        done = True
+    steps_valid(returned_steps)
+    return returned_steps
+
+
+def generate_noisy_problem(num_axioms, length, train_test, **kwargs):
+    """
+    Generate one single theorem and its proof according to requirements
+    Return the proof steps, from which the theorem can be easily extracted
+    """
+    avoid_objective_names = kwargs.get("avoid_objective_names", [])
+    # Get combos or orders ready
+    use_combos, use_orders, k_combos, kl_orders, available_indices = \
+        get_combo_order_info(num_axioms, length, train_test, **kwargs)
+    # Initialize the atomic entities and the proof
+    atom_ents, prover = initialize_prover(**kwargs)
+
+    done = False
+    returned_steps = None
+    while not done:
+        axiom_order = randomize_one_axiom_order(use_combos, use_orders, k_combos, kl_orders, available_indices, length)
+        forward_steps = get_a_forward_problem(atom_ents, prover, axiom_order, **kwargs)
+        if forward_steps is None:
+            continue
+        try:
+            # Convert the proof to backward and validate it
+            returned_steps = generate_valid_steps(forward_to_backward(forward_steps),
+                                                  noisy=kwargs.get("noisy", False), p=kwargs.get("p", 0.5))
+        except TypeError:
+            continue
+        # Check if the proof generated satisfies the specifications given
+        noisy_axiom_order = [step["lemma"].name for step in returned_steps]
+        if not proof_agrees_with_specs(returned_steps,
+                                       max([length, len(returned_steps)]),
+                                       noisy_axiom_order, avoid_objective_names):
             continue
         done = True
     steps_valid(returned_steps)
@@ -331,7 +366,10 @@ def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
     for i in range(num_probs):
         if i % 100 == 0:
             print("Problem {}".format(len(separate_problems) + 1))
-        steps = generate_problem(num_axioms, length, **kwargs)
+        if kwargs.get("noisy"):
+            steps = generate_noisy_problem(num_axioms, length, **kwargs)
+        else:
+            steps = generate_problem(num_axioms, length, **kwargs)
         all_steps.extend(steps)
         all_first_steps.append(steps[0])
         separate_problems.append(steps)
@@ -345,7 +383,8 @@ def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
         "all": all_steps_dataset,
         "all_first": all_first_steps_dataset,
     }
-
+    for problem in separate_problems:
+        print(len(problem))
     return multiple_problem_datasets, separate_problems
 
 

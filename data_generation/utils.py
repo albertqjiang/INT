@@ -10,7 +10,12 @@ from proof_system.all_axioms import all_axioms_to_prove, generation_type, all_ax
 from proof_system.logic_functions import necessary_logic_functions
 from proof_system.numerical_functions import necessary_numerical_functions
 from proof_system.utils import is_ls, is_empty_ls, is_entity
+from proof_system.graph_seq_conversion import Parser
 from logic.logic import Entity
+from visualization.latex_parse import step_to_latex
+
+random.seed(213)
+parser = Parser()
 
 
 def generate_starting_ents(degree=0):
@@ -103,13 +108,12 @@ def steps_valid(steps):
                         assembled_operands.append(ls)
                         break
             assert len(assembled_operands) == step["lemma"].input_no
-
-        test_proof.apply_theorem(theorem=step["lemma"], operands=assembled_operands, )
+        test_proof.apply_theorem(theorem=step["lemma"], operands=assembled_operands)
     # Make sure the proof is complete when all test_steps are carried out
     assert test_proof.is_proved()
 
 
-def generate_valid_steps(steps):
+def generate_normal_steps(steps):
     valid_steps = list()
     if steps is None or len(steps) == 0:
         return steps
@@ -155,6 +159,119 @@ def generate_valid_steps(steps):
     # Make sure the proof is complete when all steps are carried out
     assert test_proof.is_proved()
     return valid_steps
+
+
+def find_noisy_step(step):
+    # We find a noisy step by altering the axiom or one of the argument
+    proof_clone = Prover(axioms=all_axioms_to_prove,
+                         conditions=step["observation"]["ground_truth"],
+                         objectives=step["observation"]["objectives"],
+                         prove_direction="backward")
+    argument_no = len(step["input_entities"])
+    eligible_lemmas = [key for key, value in all_axioms_to_prove.items()
+                       if value.input_no == argument_no and key != step["lemma"].name]
+    if random.random() < 0.5 and len(eligible_lemmas) > 0:
+        proposed_lemma_name = random.choice(eligible_lemmas)
+        new_pair = (all_axioms_to_prove[proposed_lemma_name], step["input_entities"])
+    else:
+        entity_position_to_switch = random.choice(range(len(step["input_entities"])))
+        proposed_entity = random.choice(proof_clone.get_objectives()[0].ent)
+        new_arguments = list()
+        for i in range(len(step["input_entities"])):
+            if i != entity_position_to_switch:
+                new_arguments.append(step["input_entities"][i])
+            else:
+                new_arguments.append(proposed_entity)
+        new_pair = (step["lemma"], new_arguments)
+
+    assembled_operands = list()
+    for op in new_pair[1]:
+        for ls in proof_clone.get_objectives() + proof_clone.get_ground_truth():
+            if is_entity(op) and ls.name == op.root.name:
+                assembled_operands.append(ls.ent_dic[op.index])
+                break
+            elif (is_empty_ls(op) or is_ls(op)) and ls.name == op.name:
+                assembled_operands.append(ls)
+                break
+    assert len(assembled_operands) == step["lemma"].input_no, \
+        "We have {} assembled operands and need {}".format(len(assembled_operands), step["lemma"].input_no)
+
+    proof_clone.apply_theorem(new_pair[0], assembled_operands)
+    if proof_clone.objectives[0].name == step["observation"]["objectives"][0].name and \
+            set([gt.name for gt in proof_clone.get_ground_truth()]) == \
+            set([gt.name for gt in step["observation"]["ground_truth"]]):
+        return {
+            "observation": step["observation"],
+            "lemma": new_pair[0],
+            "input_entities": new_pair[1]
+        }
+    else:
+        print(proof_clone.objectives[0].name, step["observation"]["objectives"][0].name)
+
+
+def add_noise_to_steps(steps, p):
+    # p is noise level i.e. what's the proportion of invalid steps
+    test_proof = Prover(axioms=all_axioms_to_prove,
+                        conditions=steps[0]["observation"]["ground_truth"],
+                        objectives=steps[0]["observation"]["objectives"],
+                        prove_direction="backward")
+    noisy_steps = list()
+    counter = 0
+    len_steps = len(steps)
+    while counter < len_steps:
+        step = steps[counter]
+        if random.random() < p:
+            found_noisy_step = False
+            noisy_step = None
+            attempt = 0
+            while not found_noisy_step and attempt < 5:
+                attempt += 1
+                noisy_step = find_noisy_step(deepcopy(step))
+                if noisy_step:
+                    found_noisy_step = True
+                    # print("Good")
+            if attempt > 5:
+                noisy_step = step
+                counter += 1
+        else:
+            noisy_step = step
+            counter += 1
+
+        assembled_operands = list()
+        for op in noisy_step["input_entities"]:
+            # print(op.root.name)
+            # print([ls.name for ls in test_proof.get_objectives() + test_proof.get_ground_truth()])
+            for ls in test_proof.get_objectives() + test_proof.get_ground_truth():
+                if is_entity(op) and ls.name == op.root.name:
+                    assembled_operands.append(ls.ent_dic[op.index])
+                    break
+                elif is_ls(op) and ls.name == op.name:
+                    assembled_operands.append(ls)
+                    break
+
+        noisy_steps.append({"observation": test_proof.get_observation(),
+                            "lemma": noisy_step["lemma"], "input_entities": assembled_operands})
+        # print([op.name for op in noisy_step["input_entities"]])
+        # print(assembled_operands)
+        # print(test_proof.get_objectives()[0].name)
+        # print([op.name for op in noisy_step["input_entities"]])
+        try:
+            test_proof.apply_theorem(noisy_step["lemma"], assembled_operands)
+        except ValueError:
+            return steps
+
+    # assert test_proof.is_proved()
+    # print(len(noisy_steps))
+    steps_valid(noisy_steps)
+    return noisy_steps
+
+
+def generate_valid_steps(steps, noisy=False, p=None):
+    normal_steps = generate_normal_steps(steps)
+    if not noisy:
+        return normal_steps
+    else:
+        return add_noise_to_steps(normal_steps, p=p)
 
 
 class Dataset(data_handler.Dataset):
