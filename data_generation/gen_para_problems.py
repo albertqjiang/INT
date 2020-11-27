@@ -20,7 +20,7 @@ if __name__ == "__main__":
     parser.add_argument('-l', type=int)
     parser.add_argument('-seed', type=int)
     parser.add_argument('-noisy', action='store_true')
-    parser.add_argument('--noisy_p', type=float, default=0.5)
+    parser.add_argument('--noisy_p_max', type=float, default=0.9)
     parser.add_argument('--degree', type=int, default=0)
     parser.add_argument('--num_probs', type=int, default=1)
     parser.add_argument('--use_combos', action='store_true')
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     combos = json.load(open(os.path.join(args.orders_path, "combinations.json"), "r"))
     orders = json.load(open(os.path.join(args.orders_path, "orders.json"), "r"))
-    NO_PER_BATCH = 10000
+    NO_PER_BATCH = 10
     time0 = time.time()
     for j in range(int(args.num_probs/(NO_PER_BATCH + 1))+1):
         if args.use_combos:
@@ -42,13 +42,13 @@ if __name__ == "__main__":
                                                             num_probs=NO_PER_BATCH, train_test="train",
                                                             combos=combos, degree=args.degree,
                                                             num_order_or_combo=args.num_order_or_combo,
-                                                            noisy=args.noisy, p=args.noisy_p)
+                                                            noisy=args.noisy, p=args.noisy_p_max)
         else:
             datasets, problems = generate_multiple_problems(num_axioms=args.k, length=args.l,
                                                             num_probs=NO_PER_BATCH, train_test="train",
                                                             orders=orders, degree=args.degree,
                                                             num_order_or_combo=args.num_order_or_combo,
-                                                            noisy=args.noisy, p=args.noisy_p)
+                                                            noisy=args.noisy, p=args.noisy_p_max)
         pickle.dump(problems,
                     open(os.path.join(args.dump_path, "problems_seed_{}_part{}.pkl".format(args.seed, j+1)), "wb"))
 

@@ -13,6 +13,7 @@ from data_generation.forward2backward import forward_to_backward
 from proof_system.all_axioms import all_axioms
 
 random.seed(0)
+PROOF_LENGTH_LIMIT = 30
 
 
 def get_operands_when_making_up_conditions(how_to_extend, make_up_conclusions, prover, premise_names, no_atom_ents):
@@ -292,7 +293,7 @@ def generate_noisy_problem(num_axioms, length, train_test, **kwargs):
         # Check if the proof generated satisfies the specifications given
         noisy_axiom_order = [step["lemma"].name for step in returned_steps]
         if not proof_agrees_with_specs(returned_steps,
-                                       max([length, len(returned_steps)]),
+                                       min([PROOF_LENGTH_LIMIT, max([length, len(returned_steps)])]),
                                        noisy_axiom_order, avoid_objective_names):
             continue
         done = True
@@ -364,8 +365,8 @@ def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
     all_first_steps = []
 
     for i in range(num_probs):
-        if i % 100 == 0:
-            print("Problem {}".format(len(separate_problems) + 1))
+        # if i % 100 == 0:
+        #     print("Problem {}".format(len(separate_problems) + 1))
         if kwargs.get("noisy"):
             steps = generate_noisy_problem(num_axioms, length, **kwargs)
         else:

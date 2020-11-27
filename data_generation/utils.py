@@ -210,7 +210,10 @@ def find_noisy_step(step):
 
 
 def add_noise_to_steps(steps, p):
-    # p is noise level i.e. what's the proportion of invalid steps
+    # p is maximum noise level
+    # we sample the actual noise level ~Uniform(0, p)
+    # i.e. what's the proportion of invalid steps
+    noise_level = random.uniform(0, p)
     test_proof = Prover(axioms=all_axioms_to_prove,
                         conditions=steps[0]["observation"]["ground_truth"],
                         objectives=steps[0]["observation"]["objectives"],
@@ -220,7 +223,7 @@ def add_noise_to_steps(steps, p):
     len_steps = len(steps)
     while counter < len_steps:
         step = steps[counter]
-        if random.random() < p:
+        if random.random() < noise_level:
             found_noisy_step = False
             noisy_step = None
             attempt = 0
