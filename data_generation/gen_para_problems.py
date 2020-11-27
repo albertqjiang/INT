@@ -25,6 +25,7 @@ if __name__ == "__main__":
     parser.add_argument('--num_probs', type=int, default=1)
     parser.add_argument('--use_combos', action='store_true')
     parser.add_argument('--num_order_or_combo', type=int, default=None)
+    parser.add_argument('--num_per_batch', type=int, default=10000)
     args = parser.parse_args()
 
     random.seed(args.seed)
@@ -34,7 +35,7 @@ if __name__ == "__main__":
 
     combos = json.load(open(os.path.join(args.orders_path, "combinations.json"), "r"))
     orders = json.load(open(os.path.join(args.orders_path, "orders.json"), "r"))
-    NO_PER_BATCH = 10000
+    NO_PER_BATCH = args.num_per_batch
     time0 = time.time()
     for j in range(int(args.num_probs/(NO_PER_BATCH + 1))+1):
         if args.use_combos:
