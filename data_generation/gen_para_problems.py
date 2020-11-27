@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     combos = json.load(open(os.path.join(args.orders_path, "combinations.json"), "r"))
     orders = json.load(open(os.path.join(args.orders_path, "orders.json"), "r"))
-    NO_PER_BATCH = 100
+    NO_PER_BATCH = 10000
     time0 = time.time()
     for j in range(int(args.num_probs/(NO_PER_BATCH + 1))+1):
         if args.use_combos:
