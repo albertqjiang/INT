@@ -31,7 +31,14 @@ def problems_to_dreamer_form(problems):
         for i in range(len(problem)):
             state_string, action_string = next_state_string, next_action_string
             state = proof_parser.seq_string_chared(state_string)
-            action = proof_parser.seq_string_chared(action_string)
+            print(action_string)
+
+            if action_string.split()[-1].isdigit():
+                action = proof_parser.seq_string_chared(" ".join(action_string.split()[:-1])) \
+                         + " <space> {}".format(action_string.split()[-1])
+            else:
+                action = proof_parser.seq_string_chared(action_string)
+            print(action)
             reward = 1 if i == len(problem) - 1 else 0
 
             if reward == 1:
