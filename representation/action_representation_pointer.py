@@ -8,6 +8,14 @@ from visualization.seq_parse import entity_to_seq_string
 
 theorem_names = [theorem.name for theorem in list(all_axioms_to_prove.values())]
 
+thm2index = {
+    node: ind
+    for ind, node in enumerate(theorem_names)
+}
+index2thm = {
+    ind: node for ind, node in enumerate(theorem_names)
+}
+
 CONDITION_LEXEME = '&'
 OBJECTIVE_LEXEME = '#'
 PADDING_LEXEME = '_'
@@ -119,7 +127,6 @@ def generate_masks_for_logic_statement(logic_statement, symbol='~'):
 
 
 def parse_mask_for_entity(entity_with_mask, operands_with_mask_queue,  all_masks, symbol):
-
     entity = entity_with_mask.entity
     left_str = entity_with_mask.left_str
     right_str = entity_with_mask.right_str
@@ -316,11 +323,16 @@ class ActionRepresentationPointer:
 
     @classmethod
     def action_to_formula(cls, objective, action):
-        '''this version of code assumes there is exactly one objective'''
-        used_axiom = action[0]
+        '''This version of code assumes there is exactly one objective'''
+        if isinstance(action[0], int):
+            used_axiom = index2thm[action[0]]
+            entities_used = [objective.ent_dic[idx] for idx in action[1:]]
+        else:
+            used_axiom = action[0]
+            entities_used = action[1:]
         formula = OUTPUT_START_LEXEME + AXIOM_TO_CHAR[used_axiom]
         entity_to_mask, mask_to_entity = generate_masks_for_logic_statement(objective, symbol='~')
-        masks = [entity_to_mask[entity] for entity in action[1:]]
+        masks = [entity_to_mask[entity] for entity in entities_used]
         formula += cls.merge_masks(masks) + EOS_LEXEME
         return formula
 
@@ -368,5 +380,49 @@ class ActionRepresentationPointer:
     def action_from_char(char):
         if char in CHAR_TO_AXIOM:
             return CHAR_TO_AXIOM[char]
+        else:
+            return None
+
+    @classmethod
+    def pointer_str_to_action(cls, objective, action_str, mode='idx'):
+        action_raw = cls.split_pointer_action_str(action_str)
+        assert action_raw is not None, 'Improperly decoded action string'
+        _, mask_to_entity = generate_masks_for_logic_statement(objective)
+        action = [action_raw[0]]
+        for entity_str in action_raw[1:]:
+            if entity_str in mask_to_entity:
+                action.append(mask_to_entity[entity_str])
+            else:
+                raise ValueError(f'Unrecognized entity: {entity_str}')
+
+        if mode == 'idx':
+            action[0] = thm2index[action[0]]
+            for i in range(1, len(action)):
+                action[i] = action[i].index
+
+        return tuple(action)
+
+    @staticmethod
+    def split_pointer_action_str(action_str):
+        if action_str[0] != '@' or action_str[-1:] != '$':
+            raise ValueError('Invalid prediction format')
+        prediction_str = action_str[1:-1]
+        if len(prediction_str) == 0:
+            return None
+
+        if prediction_str[0] in CHAR_TO_AXIOM:
+            axiom = CHAR_TO_AXIOM[prediction_str[0]]
+            axiom_len = AXIOM_LENGTH[prediction_str[0]]
+            input_entities_raw = [prediction_str[1:] for _ in range(axiom_len)]
+            input_entities_str = []
+            for num in range(len(input_entities_raw)):
+                entity_str = input_entities_raw[num]
+                pointer_symbol = POINTER_SYMBOLS[num]
+                for different_pointer_symbol in POINTER_SYMBOLS:
+                    if different_pointer_symbol != pointer_symbol:
+                        entity_str = entity_str.replace(different_pointer_symbol, '')
+                entity_str = entity_str.replace(pointer_symbol, POINTER_SYMBOLS[0])
+                input_entities_str.append(entity_str)
+            return [axiom, *input_entities_str]
         else:
             return None
