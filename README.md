@@ -1,7 +1,25 @@
 # INT
-This is the official code for the paper INT: An Inequality Benchmark for Evaluating Generalization in Theorem Proving.
+This is the official code for the paper 
+[INT: An Inequality Benchmark for Evaluating Generalization in Theorem Proving](https://arxiv.org/abs/2007.02924).
 
-The directory contains
+To cite the paper, use:
+```
+@inproceedings{WJBG2021INT,
+  author    = {Yuhuai Wu and
+               Albert Jiang and
+               Jimmy Ba and
+               Roger Baker Grosse},
+  title     = {{INT:} An Inequality Benchmark for Evaluating Generalization in Theorem
+               Proving},
+  booktitle = {9th International Conference on Learning Representations, {ICLR} 2021,
+               Virtual Event, Austria, May 3-7, 2021},
+  publisher = {OpenReview.net},
+  year      = {2021},
+  url       = {https://openreview.net/forum?id=O6LPudowNQm},
+}
+```
+
+This directory contains
 
 * a light-weight theorem prover with fast interactions
 * the generator of theorems and proofs in the INT dataset
@@ -38,11 +56,21 @@ for fewer than 5 unique axioms and 5 axiom applications in a proof, with 10000 t
 python data_generation/combos_and_orders.py --combo_path data/benchmark/field --max_k 5 --max_l 5 --trial 10000
 ```
 After getting the axiom combinations and orders, we can use them to generate synthetic theorems and proofs.
-The command below generates 100 separate theorems and corresponding proofs with the parameters k=5, l=5.
+The command below generates 100 separate theorems and corresponding proofs, for graph processing, 
+with the parameters k=5, l=5.
 ```bash
-python data_generation/generate_problems.py --orders_path data/benchmark/field -k 5 -l 5 --num_probs 100
+python data_generation/generate_problems.py --orders_path data/benchmark/field -k 5 -l 5 --num_probs 100 -dp $dump_path
 ```
 
+For seq2seq training, use the following command instead:
+```bash
+python data_generation/gen_seq2seq.py --orders_path data/benchmark/field/  -k 5 -l 5 --num_probs 100 -dp $dump_path
+```
+
+To visualise 5 proofs just generated using the seq2seq mode, use the following command:
+```bash
+python visualization/display_proofs.py --proof-file $dump_path/problems.pkl --how-many 5
+```
 
 ## Training
 We prepare the training script for a graph-neural-network based agent. 
