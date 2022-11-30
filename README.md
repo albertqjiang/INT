@@ -44,8 +44,7 @@ The software packages required are:
 ## Setup
 ```bash
 git clone https://github.com/albertqjiang/INT
-cd INT
-export PYTHONPATH="$PWD:$PYTHONPATH"
+cd INT/int_environment
 ```
 
 ## Data
@@ -53,23 +52,23 @@ To generate the theorems and proofs, we need to first generate the axiom combina
 The following command generates the axiom combinations and orders 
 for fewer than 5 unique axioms and 5 axiom applications in a proof, with 10000 trials for each (k, l) pair.
 ```bash
-python data_generation/combos_and_orders.py --combo_path data/benchmark/field --max_k 5 --max_l 5 --trial 10000
+python -m data_generation.combos_and_orders --combo_path data/benchmark/field --max_k 5 --max_l 5 --trial 10000
 ```
 After getting the axiom combinations and orders, we can use them to generate synthetic theorems and proofs.
 The command below generates 100 separate theorems and corresponding proofs, for graph processing, 
 with the parameters k=5, l=5.
 ```bash
-python data_generation/generate_problems.py --orders_path data/benchmark/field -k 5 -l 5 --num_probs 100 -dp $dump_path
+python -m data_generation.generate_problems --orders_path data/benchmark/field -k 5 -l 5 --num_probs 100 -dp $dump_path
 ```
 
 For seq2seq training, use the following command instead:
 ```bash
-python data_generation/gen_seq2seq.py --orders_path data/benchmark/field/  -k 5 -l 5 --num_probs 100 -dp $dump_path
+python -m data_generation.gen_seq2seq --orders_path data/benchmark/field/  -k 5 -l 5 --num_probs 100 -dp $dump_path
 ```
 
 To visualise 5 proofs just generated using the seq2seq mode, use the following command:
 ```bash
-python visualization/display_proofs.py --proof-file $dump_path/problems.pkl --how-many 5
+python -m visualization.display_proofs --proof-file $dump_path/problems.pkl --how-many 5
 ```
 
 ## Training
@@ -80,7 +79,7 @@ and train 10 epochs on them before generating a new set of problems.
 The training results and models are dumped in directory `data/pt_models`.
 ```bash
 mkdir data/pt_models
-python algos/main.py -cp data/benchmark/field -du data/pt_models/ --online -trs k\=5_l\=5 -tes k\=5_l\=5 -epod 10 -np 1000 --lr 1e-4 -u 1000000 -tg --degree 0 --seed 0
+python -m algos.main -cp data/benchmark/field -du data/pt_models/ --online -trs k\=5_l\=5 -tes k\=5_l\=5 -epod 10 -np 1000 --lr 1e-4 -u 1000000 -tg --degree 0 --seed 0
 ```
 
 ## Documentation for important functions and classes
