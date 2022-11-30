@@ -3,9 +3,9 @@ import pickle
 import json
 import argparse
 
-from proof_system.prover import Prover
-from data_generation.seq_prefairseq import chared_to_string
-from proof_system.all_axioms import all_axioms_to_prove
+from int_environment.proof_system.prover import Prover
+from int_environment.data_generation.seq_prefairseq import chared_to_string
+from int_environment.proof_system.all_axioms import all_axioms_to_prove
 
 
 def process_fairseq_generation_file(generation_file_folder):

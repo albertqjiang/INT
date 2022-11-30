@@ -1,6 +1,6 @@
-from algos.eval import eval_agent
-from data_generation.generate_problems import generate_multiple_problems
-from data_generation.utils import Dataset
+from int_environment.algos.eval import eval_agent
+from int_environment.data_generation.generate_problems import generate_multiple_problems
+from int_environment.data_generation.utils import Dataset
 
 import argparse
 import os

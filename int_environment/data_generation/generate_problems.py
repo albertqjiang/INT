@@ -6,11 +6,11 @@ import os
 import json
 import shutil
 
-from data_generation.utils import steps_valid, make_up_condition, \
+from int_environment.data_generation.utils import steps_valid, make_up_condition, \
     generate_valid_steps, Dataset, proof_agrees_with_specs, initialize_prover, gather_available_entities
-from data_generation.combos_and_orders import get_combo_order_info, randomize_one_axiom_order
-from data_generation.forward2backward import forward_to_backward
-from proof_system.all_axioms import all_axioms
+from int_environment.data_generation.combos_and_orders import get_combo_order_info, randomize_one_axiom_order
+from int_environment.data_generation.forward2backward import forward_to_backward
+from int_environment.proof_system.all_axioms import all_axioms
 
 random.seed(0)
 

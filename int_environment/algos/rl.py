@@ -13,14 +13,14 @@ import torch
 
 from a2c_ppo_acktr import algo, utils
 from a2c_ppo_acktr.storage import RolloutStorage
-from algos.lib.arguments import get_args
-from algos.eval import eval_agent
-from algos.lib.envs import make_thm_vec_envs
-from algos.lib.obs import nodename2index, thm2index
+from int_environment.algos.lib.arguments import get_args
+from int_environment.algos.eval import eval_agent
+from int_environment.algos.lib.envs import make_thm_vec_envs
+from int_environment.algos.lib.obs import nodename2index, thm2index
 from legacy.data_generation.random_numerical_specified import load_online_combo_and_length
-from algos.lib.ops import turn_grad_on_off
-from algos.model.thm_model import ThmNet
-from data_generation.utils import Dataset
+from int_environment.algos.lib.ops import turn_grad_on_off
+from int_environment.algos.model.thm_model import ThmNet
+from int_environment.data_generation.utils import Dataset
 
 torch.manual_seed(123)
 

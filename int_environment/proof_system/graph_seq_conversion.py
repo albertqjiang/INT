@@ -1,5 +1,5 @@
-from visualization.seq_parse import entity_to_seq_string, logic_statement_to_seq_string
-from proof_system.all_axioms import all_axioms_to_prove
+from int_environment.visualization.seq_parse import entity_to_seq_string, logic_statement_to_seq_string
+from int_environment.proof_system.all_axioms import all_axioms_to_prove
 
 
 compact_theorem_name = {
@@ -168,7 +168,7 @@ class Parser:
 
 if __name__ == "__main__":
     import json
-    from data_generation.generate_problems import generate_multiple_problems
+    from int_environment.data_generation.generate_problems import generate_multiple_problems
     orders = json.load(open("/Users/qj213/Papers/My papers/INT_arXiv/INT/data/benchmark/ordered_field/orders.json"))
     dataset, problems = generate_multiple_problems(num_axioms=3, length=3,
                                                    num_probs=100, train_test="train",

@@ -1,7 +1,7 @@
 import itertools
 
 
-from logic.logic import *
+from int_environment.logic.logic import *
 
 Real = LogicFunction("Real", 1)
 NonNegative = LogicFunction("NonNegative", 1)

@@ -1,6 +1,6 @@
-from proof_system.special_axioms import EquivalenceSubstitution
-from proof_system.field_axioms import field_axioms
-from proof_system.ordered_field_additional_axioms import ordered_field_additional_axioms
+from int_environment.proof_system.special_axioms import EquivalenceSubstitution
+from int_environment.proof_system.field_axioms import field_axioms
+from int_environment.proof_system.ordered_field_additional_axioms import ordered_field_additional_axioms
 
 special_axioms = {
     "EquivalenceSubstitution": EquivalenceSubstitution(),

@@ -164,7 +164,7 @@ class Theorem:
 
     def input_valid(self, inputs, numerical_evaluator=None):
         if not numerical_evaluator:
-            from logic.utils import NumericalEvaluator
+            from int_environment.logic.utils import NumericalEvaluator
             numerical_evaluator = NumericalEvaluator()
         for constraint in self.input_constraints:
             if not numerical_evaluator.equal_pair(

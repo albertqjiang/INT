@@ -4,8 +4,8 @@ import json
 import os
 from copy import deepcopy
 
-from proof_system.all_axioms import generation_type, axiom_sets
-from data_generation.utils import valid_combo
+from int_environment.proof_system.all_axioms import generation_type, axiom_sets
+from int_environment.data_generation.utils import valid_combo
 
 random.seed(0)
 

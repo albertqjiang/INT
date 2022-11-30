@@ -3,7 +3,7 @@ import random
 import numpy as np
 import torch
 
-from algos.lib.envs import make_thm_env
+from int_environment.algos.lib.envs import make_thm_env
 random.seed(0)
 
 

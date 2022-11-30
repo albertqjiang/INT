@@ -9,7 +9,7 @@ from baselines.common.vec_env.util import copy_obs_dict, dict_to_obs, obs_space_
 
 def make_thm_env(env_config, rank=0, log_dir=None, allow_early_resets=False):
     def _thunk():
-        from algos.thm_env import TheoremProver
+        from int_environment.algos.thm_env import TheoremProver
         env = TimeLimit(TheoremProver(env_config), env_config["time_limit"])
 
         if log_dir is not None:

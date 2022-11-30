@@ -4,8 +4,8 @@ import os
 import random
 import pickle
 
-from data_generation.generate_problems import generate_multiple_problems
-from proof_system.graph_seq_conversion import Parser
+from int_environment.data_generation.generate_problems import generate_multiple_problems
+from int_environment.proof_system.graph_seq_conversion import Parser
 
 
 random.seed(213)

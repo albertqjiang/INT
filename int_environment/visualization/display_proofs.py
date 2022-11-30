@@ -1,7 +1,7 @@
 import argparse
 import pickle
 
-from visualization.latex_parse import step_to_latex
+from int_environment.visualization.latex_parse import step_to_latex
 
 
 def display_a_proof(steps):

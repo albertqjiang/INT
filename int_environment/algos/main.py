@@ -18,11 +18,11 @@ import torch
 import torch.optim as optim
 import torch.utils.data as data_handler
 
-from algos.eval import eval_agent
-from algos.lib.obs import nodename2index, thm2index, batch_process
-from algos.lib.arguments import get_args
-from data_generation.generate_problems import generate_multiple_problems
-from data_generation.utils import Dataset
+from int_environment.algos.eval import eval_agent
+from int_environment.algos.lib.obs import nodename2index, thm2index, batch_process
+from int_environment.algos.lib.arguments import get_args
+from int_environment.data_generation.generate_problems import generate_multiple_problems
+from int_environment.data_generation.utils import Dataset
 
 timestamp = str(datetime.fromtimestamp(time())).replace(" ", "_").replace(":", "_").replace("-", "_").replace(".", "_")
 args = get_args()
@@ -37,11 +37,11 @@ dgl = (args.obs_mode == "dgl")
 bow = args.bag_of_words
 print(args.transform_gt)
 if dgl and (not bow):
-    from algos.model.thm_model_dgl import ThmNet
+    from int_environment.algos.model.thm_model_dgl import ThmNet
 elif bow and (not dgl):
-    from algos.model.thm_model import ThmNet
+    from int_environment.algos.model.thm_model import ThmNet
 elif (not bow) and (not dgl):
-    from algos.model.thm_model import ThmNet
+    from int_environment.algos.model.thm_model import ThmNet
 else:
     raise AssertionError
 

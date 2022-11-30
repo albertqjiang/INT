@@ -2,11 +2,11 @@ import gym
 from gym import spaces
 from gym.utils import seeding
 
-from proof_system.all_axioms import all_axioms_to_prove
-from proof_system.prover import Prover
-from algos.lib.obs import obs_to_graphs, index2thm, obs_to_graphs_dgl
-from visualization.latex_parse import logic_statement_to_latex, entity_to_latex
-from data_generation.generate_problems import generate_problem
+from int_environment.proof_system.all_axioms import all_axioms_to_prove
+from int_environment.proof_system.prover import Prover
+from int_environment.algos.lib.obs import obs_to_graphs, index2thm, obs_to_graphs_dgl
+from int_environment.visualization.latex_parse import logic_statement_to_latex, entity_to_latex
+from int_environment.data_generation.generate_problems import generate_problem
 import random
 
 random.seed(123)

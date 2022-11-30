@@ -1,10 +1,10 @@
 import difflib
 import string
 
-from proof_system.all_axioms import all_axioms_to_prove
-from representation import base
-from visualization import seq_parse
-from visualization.seq_parse import entity_to_seq_string
+from int_environment.proof_system.all_axioms import all_axioms_to_prove
+from int_environment.representation import base
+from int_environment.visualization import seq_parse
+from int_environment.visualization.seq_parse import entity_to_seq_string
 
 theorem_names = [theorem.name for theorem in list(all_axioms_to_prove.values())]
 

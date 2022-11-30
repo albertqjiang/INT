@@ -1,4 +1,4 @@
-from logic.logic import LogicFunction
+from int_environment.logic.logic import LogicFunction
 
 BiggerOrEqual = LogicFunction("BiggerOrEqual", 2)
 SmallerOrEqual = LogicFunction("SmallerOrEqual", 2)

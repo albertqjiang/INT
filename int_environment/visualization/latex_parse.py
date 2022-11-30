@@ -1,7 +1,7 @@
 import re
 
-from logic.logic import Entity
-from logic.utils import standard_numerical_functions
+from int_environment.logic.logic import Entity
+from int_environment.logic.utils import standard_numerical_functions
 
 
 def split_count(s, count):
@@ -211,7 +211,7 @@ if __name__ == "__main__":
 
     import pickle
     from legacy.connection_prover_exp.connection_prover import ConnectionProver
-    from proof_system.all_axioms import all_axioms
+    from int_environment.proof_system.all_axioms import all_axioms
     from pprint import pprint
 
     steps_by_objective = dict()

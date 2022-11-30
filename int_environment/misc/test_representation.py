@@ -1,7 +1,7 @@
 import json
 
-from data_generation.generate_problems import generate_multiple_problems
-from representation.action_representation_pointer import ActionRepresentationPointer, thm2index
+from int_environment.data_generation.generate_problems import generate_multiple_problems
+from int_environment.representation.action_representation_pointer import ActionRepresentationPointer, thm2index
 
 with open('data/benchmark/field/combinations.json', 'r') as file:
     combos = json.load(file)

@@ -28,9 +28,9 @@ from fairseq.data import encoders
 from fairseq.token_generation_constraints import pack_constraints, unpack_constraints
 from fairseq_cli.generate import get_symbols_to_strip_from_output
 
-from proof_system.prover import Prover
-from data_generation.seq_prefairseq import chared_to_string, filter_arrow
-from proof_system.all_axioms import all_axioms_to_prove
+from int_environment.proof_system.prover import Prover
+from int_environment.data_generation.seq_prefairseq import chared_to_string, filter_arrow
+from int_environment.proof_system.all_axioms import all_axioms_to_prove
 
 
 logging.basicConfig(

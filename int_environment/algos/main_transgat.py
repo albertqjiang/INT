@@ -11,12 +11,12 @@ import torch.optim as optim
 import torch.utils.data as data_handler
 from transformers import get_cosine_schedule_with_warmup
 
-from algos.eval import eval_agent
-from algos.lib.obs import nodename2index, thm2index, batch_process
-from data_generation.generate_problems import generate_multiple_problems
-from data_generation.utils import Dataset
+from int_environment.algos.eval import eval_agent
+from int_environment.algos.lib.obs import nodename2index, thm2index, batch_process
+from int_environment.data_generation.generate_problems import generate_multiple_problems
+from int_environment.data_generation.utils import Dataset
 from TransGrapher.models.TransGAT import TransGATThmNet
-from algos.model.thm_model import ThmNet
+from int_environment.algos.model.thm_model import ThmNet
 
 
 use_gpu = torch.cuda.is_available()

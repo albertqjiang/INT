@@ -1,4 +1,4 @@
-from logic.logic import NumericalFunction
+from int_environment.logic.logic import NumericalFunction
 from collections import OrderedDict
 
 add = NumericalFunction("add", 2)

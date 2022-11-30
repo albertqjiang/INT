@@ -6,9 +6,9 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from algos.model.gnns import TreeLSTM, FCResBlock
-from algos.lib.ops import one_hot, graph_softmax
-from algos.lib.obs import tile_obs_acs, thm2index, compute_mask, compute_trans_ind, theorem_no_input, index2thm, \
+from int_environment.algos.model.gnns import TreeLSTM, FCResBlock
+from int_environment.algos.lib.ops import one_hot, graph_softmax
+from int_environment.algos.lib.obs import tile_obs_acs, thm2index, compute_mask, compute_trans_ind, theorem_no_input, index2thm, \
     thm_index2no_input, convert_obs_to_dict
 from torch_geometric.data import Batch
 from torch.distributions import Categorical, Uniform

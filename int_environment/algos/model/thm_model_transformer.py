@@ -1,7 +1,7 @@
 import os
 import sys
 
-from algos.lib.obs import one_hot, thm2index, index2thm, theorem_no_input, thm_index2no_input, convert_obs_to_dict, \
+from int_environment.algos.lib.obs import one_hot, thm2index, index2thm, theorem_no_input, thm_index2no_input, convert_obs_to_dict, \
     convert_batch_obs_to_dict
 
 sys.path.insert(0, os.path.abspath('../../Inequality'))
@@ -9,8 +9,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from algos.gnns import FCResBlock
-from algos.transformer.modules.models import make_thm_model
+from int_environment.algos.gnns import FCResBlock
+from int_environment.algos.transformer.modules.models import make_thm_model
 from torch_geometric.data import Batch
 from torch.distributions import Categorical, Uniform
 from torch_scatter import scatter_add, scatter_max

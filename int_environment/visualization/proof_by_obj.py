@@ -1,7 +1,7 @@
 import pickle
 from legacy.connection_prover_exp.connection_prover_lean import ConnectionProverLean
-from proof_system.all_axioms import all_axioms
-from visualization.latex_parse import logic_statement_to_latex, entity_to_latex
+from int_environment.proof_system.all_axioms import all_axioms
+from int_environment.visualization.latex_parse import logic_statement_to_latex, entity_to_latex
 
 
 def display_proof(directory):

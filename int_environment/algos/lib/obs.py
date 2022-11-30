@@ -1,9 +1,9 @@
 import torch
 from torch_geometric.data import Data
-from algos.lib.ops import one_hot
-from proof_system.all_axioms import all_axioms_to_prove
-from proof_system.numerical_functions import necessary_numerical_functions
-from proof_system.logic_functions import necessary_logic_functions
+from int_environment.algos.lib.ops import one_hot
+from int_environment.proof_system.all_axioms import all_axioms_to_prove
+from int_environment.proof_system.numerical_functions import necessary_numerical_functions
+from int_environment.proof_system.logic_functions import necessary_logic_functions
 import numpy as np
 
 # import dgl

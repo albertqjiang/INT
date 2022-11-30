@@ -1,9 +1,9 @@
 import random
 from copy import deepcopy
 
-from proof_system.meta_axiom import MetaAxiom
-from proof_system.logic_functions import necessary_logic_functions
-from proof_system.utils import side_of_an_entity, search_operator_operands_in_gt
+from int_environment.proof_system.meta_axiom import MetaAxiom
+from int_environment.proof_system.logic_functions import necessary_logic_functions
+from int_environment.proof_system.utils import side_of_an_entity, search_operator_operands_in_gt
 
 random.seed(0)
 

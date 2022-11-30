@@ -5,12 +5,12 @@ from collections import OrderedDict
 
 from torch.utils import data as data_handler
 
-from proof_system.prover import Prover
-from proof_system.all_axioms import all_axioms_to_prove, generation_type, all_axioms
-from proof_system.logic_functions import necessary_logic_functions
-from proof_system.numerical_functions import necessary_numerical_functions
-from proof_system.utils import is_ls, is_empty_ls, is_entity
-from logic.logic import Entity
+from int_environment.proof_system.prover import Prover
+from int_environment.proof_system.all_axioms import all_axioms_to_prove, generation_type, all_axioms
+from int_environment.proof_system.logic_functions import necessary_logic_functions
+from int_environment.proof_system.numerical_functions import necessary_numerical_functions
+from int_environment.proof_system.utils import is_ls, is_empty_ls, is_entity
+from int_environment.logic.logic import Entity
 
 
 def generate_starting_ents(degree=0):

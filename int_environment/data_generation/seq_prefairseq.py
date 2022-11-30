@@ -6,7 +6,7 @@ from io import open
 import random
 import argparse
 
-from data_generation.gen_seq2seq import generate_multiple_seq2seq
+from int_environment.data_generation.gen_seq2seq import generate_multiple_seq2seq
 
 
 def control_symbols(string):
