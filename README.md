@@ -82,6 +82,12 @@ mkdir data/pt_models
 python -m algos.main -cp data/benchmark/field -du data/pt_models/ --online -trs k\=5_l\=5 -tes k\=5_l\=5 -epod 10 -np 1000 --lr 1e-4 -u 1000000 -tg --degree 0 --seed 0
 ```
 
+## Executing tests
+Simply run:
+```
+pytest test
+```
+
 ## Documentation for important functions and classes
 [INT/data_generation/generate_problems.py:268](https://github.com/albertqjiang/INT/blob/2ec739c94b2feb5f7f80b3d5e71e8b751dbd9ef3/data_generation/generate_problems.py#L268)
 ```python
