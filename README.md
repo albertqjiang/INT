@@ -1,8 +1,10 @@
 # INT
-This is the official code for the paper 
+
+This is the official code for the paper
 [INT: An Inequality Benchmark for Evaluating Generalization in Theorem Proving](https://arxiv.org/abs/2007.02924).
 
 To cite the paper, use:
+
 ```
 @inproceedings{WJBG2021INT,
   author    = {Yuhuai Wu and
@@ -26,6 +28,7 @@ This directory contains
 * the scripts for training agents to prove such theorems
 
 ## Installation
+
 The software packages required are:
 
 [PyTorch](https://pytorch.org/)
@@ -40,56 +43,68 @@ The software packages required are:
 
 [OpenAI Baselines](https://github.com/openai/baselines)
 
-
 ## Setup
+
 ```bash
 git clone https://github.com/albertqjiang/INT
-cd INT/int_environment
+cd INT
 ```
 
 ## Data
+
 To generate the theorems and proofs, we need to first generate the axiom combinations and orders to use.
-The following command generates the axiom combinations and orders 
+The following command generates the axiom combinations and orders
 for fewer than 5 unique axioms and 5 axiom applications in a proof, with 10000 trials for each (k, l) pair.
+
 ```bash
-python -m data_generation.combos_and_orders --combo_path data/benchmark/field --max_k 5 --max_l 5 --trial 10000
+python -m int_environment.data_generation.combos_and_orders --combo_path data/benchmark/field --max_k 5 --max_l 5 --trial 10000
 ```
+
 After getting the axiom combinations and orders, we can use them to generate synthetic theorems and proofs.
-The command below generates 100 separate theorems and corresponding proofs, for graph processing, 
+The command below generates 100 separate theorems and corresponding proofs, for graph processing,
 with the parameters k=5, l=5.
+
 ```bash
-python -m data_generation.generate_problems --orders_path data/benchmark/field -k 5 -l 5 --num_probs 100 -dp $dump_path
+python -m int_environment.data_generation.generate_problems --orders_path data/benchmark/field -k 5 -l 5 --num_probs 100 -dp $dump_path
 ```
 
 For seq2seq training, use the following command instead:
+
 ```bash
-python -m data_generation.gen_seq2seq --orders_path data/benchmark/field/  -k 5 -l 5 --num_probs 100 -dp $dump_path
+python -m int_environment.data_generation.gen_seq2seq --orders_path data/benchmark/field/  -k 5 -l 5 --num_probs 100 -dp $dump_path
 ```
 
 To visualise 5 proofs just generated using the seq2seq mode, use the following command:
+
 ```bash
-python -m visualization.display_proofs --proof-file $dump_path/problems.pkl --how-many 5
+python -m int_environment.visualization.display_proofs --proof-file $dump_path/problems.pkl --how-many 5
 ```
 
 ## Training
-We prepare the training script for a graph-neural-network based agent. 
+
+We prepare the training script for a graph-neural-network based agent.
 The command below trains the agent for 1 million updates in an online setting.
-We generate 1000 theorems and proofs with the setting k=3, l=3 
+We generate 1000 theorems and proofs with the setting k=3, l=3
 and train 10 epochs on them before generating a new set of problems.
 The training results and models are dumped in directory `data/pt_models`.
+
 ```bash
 mkdir data/pt_models
-python -m algos.main -cp data/benchmark/field -du data/pt_models/ --online -trs k\=5_l\=5 -tes k\=5_l\=5 -epod 10 -np 1000 --lr 1e-4 -u 1000000 -tg --degree 0 --seed 0
+python -m int_environment.algos.main -cp data/benchmark/field -du data/pt_models/ --online -trs k\=5_l\=5 -tes k\=5_l\=5 -epod 10 -np 1000 --lr 1e-4 -u 1000000 -tg --degree 0 --seed 0
 ```
 
 ## Executing tests
+
 Simply run:
+
 ```
 pytest test
 ```
 
 ## Documentation for important functions and classes
+
 [INT/data_generation/generate_problems.py:268](https://github.com/albertqjiang/INT/blob/2ec739c94b2feb5f7f80b3d5e71e8b751dbd9ef3/data_generation/generate_problems.py#L268)
+
 ```python
 def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
     """
@@ -152,8 +167,8 @@ def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
     """
 ```
 
-    
 [INT/proof_system/prover.py:4](https://github.com/albertqjiang/INT/blob/2ec739c94b2feb5f7f80b3d5e71e8b751dbd9ef3/proof_system/prover.py#L4)
+
 ```python
 class Prover:
     def __init__(self, axioms: dict, conditions: list, objectives: list, prove_direction: str):
@@ -176,7 +191,7 @@ class Prover:
         """
         Register the initial conditions as ground truth
         """
-        
+
     def add_logic_statement(self, logic_statement):
         """
         Index and register a logic statement
@@ -201,7 +216,7 @@ class Prover:
         """
         Get the ids of all entities in a logic statement
         """
-        
+
     def _add_entity(self, entity):
         """
         Add one entity to the register, return the id.
