@@ -123,3 +123,6 @@ pt_models/
 # random stuff
 archive/
 scripts/
+
+*.iml
+.DS_Store
