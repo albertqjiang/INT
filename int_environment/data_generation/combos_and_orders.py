@@ -1,11 +1,11 @@
-import random
 import argparse
 import json
 import os
+import random
 from copy import deepcopy
 
-from int_environment.proof_system.all_axioms import generation_type, axiom_sets
 from int_environment.data_generation.utils import valid_combo
+from int_environment.proof_system.all_axioms import generation_type, axiom_sets
 
 random.seed(0)
 
@@ -132,6 +132,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='ComboOrderGen')
     parser.add_argument('-cp', "--combo_path", required=False, type=str,
                         default="data/benchmark/field")
+    parser.add_argument('-a', "--axiom_set", required=False, type=str)
     parser.add_argument('-mk', "--max_k", required=False, type=int,
                         default=7)
     parser.add_argument('-ml', "--max_l", required=False, type=int,
@@ -142,7 +143,7 @@ if __name__ == "__main__":
     if not os.path.isdir(args.combo_path):
         os.makedirs(args.combo_path)
 
-    axiom_set = args.combo_path.split("/")[-1]
+    axiom_set = args.axiom_set or args.combo_path.split("/")[-1]
     axioms_to_use = axiom_sets[axiom_set]
     axiom_combinations, axiom_orders, = generate_combinations_and_orders(
         axioms_to_use,
