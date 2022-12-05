@@ -272,10 +272,10 @@ def generate_problem(num_axioms, length, train_test, **kwargs):
 
 
 def _generate_many_problems(num: int, arg_dict):
-    print(f'generate_many_problems start num={num}')
+    # print(f'generate_many_problems start num={num}')
     start_time = time.time()
     ans = [generate_problem(**arg_dict) for _ in range(num)]
-    print(f'generate_many_problems end time={time.time() - start_time}')
+    print(f'generate_many_problems done num={num} time={time.time() - start_time}')
     return ans
 
 
@@ -342,12 +342,12 @@ def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
     all_steps = []
     all_first_steps = []
 
-    num_sub_works = 200
+    num_sub_works = 20
     num_problems_per_subprocess = [num_probs // num_sub_works for _ in range(num_sub_works)]
     assert sum(num_problems_per_subprocess) == num_probs
     generate_problem_args = dict(num_axioms=num_axioms, length=length, **kwargs)
 
-    with ProcessPoolExecutor(max_workers=16) as executor:
+    with ProcessPoolExecutor(max_workers=20) as executor:
         for generated_steps_arr in executor.map(_generate_many_problems, num_problems_per_subprocess,
                                                 (generate_problem_args for _ in range(num_sub_works))):
             for generated_steps in generated_steps_arr:
