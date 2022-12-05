@@ -1,15 +1,15 @@
-import random
-from copy import deepcopy
 import argparse
-import pickle
-import os
 import json
+import os
+import pickle
+import random
 import shutil
+from copy import deepcopy
 
-from int_environment.data_generation.utils import steps_valid, make_up_condition, \
-    generate_valid_steps, Dataset, proof_agrees_with_specs, initialize_prover, gather_available_entities
 from int_environment.data_generation.combos_and_orders import get_combo_order_info, randomize_one_axiom_order
 from int_environment.data_generation.forward2backward import forward_to_backward
+from int_environment.data_generation.utils import steps_valid, make_up_condition, \
+    generate_valid_steps, Dataset, proof_agrees_with_specs, initialize_prover, gather_available_entities
 from int_environment.proof_system.all_axioms import all_axioms
 
 random.seed(0)
