@@ -1,15 +1,17 @@
-import random
-from copy import deepcopy
 import argparse
-import pickle
-import os
 import json
+import os
+import pickle
+import random
 import shutil
+import time
+from concurrent.futures import ProcessPoolExecutor
+from copy import deepcopy
 
-from int_environment.data_generation.utils import steps_valid, make_up_condition, \
-    generate_valid_steps, Dataset, proof_agrees_with_specs, initialize_prover, gather_available_entities
 from int_environment.data_generation.combos_and_orders import get_combo_order_info, randomize_one_axiom_order
 from int_environment.data_generation.forward2backward import forward_to_backward
+from int_environment.data_generation.utils import steps_valid, make_up_condition, \
+    generate_valid_steps, Dataset, proof_agrees_with_specs, initialize_prover, gather_available_entities
 from int_environment.proof_system.all_axioms import all_axioms
 
 random.seed(0)
@@ -236,6 +238,8 @@ def generate_problem(num_axioms, length, train_test, **kwargs):
     Generate one single theorem and its proof according to requirements
     Return the proof steps, from which the theorem can be easily extracted
     """
+    # time_start = time.time()
+
     avoid_objective_names = kwargs.get("avoid_objective_names", [])
     # Get combos or orders ready
     use_combos, use_orders, k_combos, kl_orders, available_indices = \
@@ -262,7 +266,17 @@ def generate_problem(num_axioms, length, train_test, **kwargs):
             continue
         done = True
     steps_valid(returned_steps)
+
+    # print(f'generate_problem time={time.time() - time_start}')
     return returned_steps
+
+
+def _generate_many_problems(num: int, arg_dict):
+    # print(f'generate_many_problems start num={num}')
+    start_time = time.time()
+    ans = [generate_problem(**arg_dict) for _ in range(num)]
+    # print(f'generate_many_problems done num={num} time={time.time() - start_time}')
+    return ans
 
 
 def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
@@ -328,13 +342,19 @@ def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
     all_steps = []
     all_first_steps = []
 
-    for i in range(num_probs):
-        if i % 100 == 0:
-            print("Problem {}".format(len(separate_problems) + 1))
-        steps = generate_problem(num_axioms, length, **kwargs)
-        all_steps.extend(steps)
-        all_first_steps.append(steps[0])
-        separate_problems.append(steps)
+    num_sub_works = 20
+    num_problems_per_subprocess = [num_probs // num_sub_works for _ in range(num_sub_works)]
+    assert sum(num_problems_per_subprocess) == num_probs
+    generate_problem_args = dict(num_axioms=num_axioms, length=length, **kwargs)
+
+    with ProcessPoolExecutor(max_workers=20) as executor:
+        for generated_steps_arr in executor.map(_generate_many_problems, num_problems_per_subprocess,
+                                                (generate_problem_args for _ in range(num_sub_works))):
+            for generated_steps in generated_steps_arr:
+                all_steps.extend(generated_steps)
+                all_first_steps.append(generated_steps[0])
+                separate_problems.append(generated_steps)
+            print(f'#Generated problems: {len(separate_problems)}')
 
     random.shuffle(all_steps)
     random.shuffle(all_first_steps)
