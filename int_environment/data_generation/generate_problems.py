@@ -4,6 +4,7 @@ import os
 import pickle
 import random
 import shutil
+from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 
 from int_environment.data_generation.combos_and_orders import get_combo_order_info, randomize_one_axiom_order
@@ -265,6 +266,10 @@ def generate_problem(num_axioms, length, train_test, **kwargs):
     return returned_steps
 
 
+def generate_problem_wrapped(arg_dict):
+    return generate_problem(**arg_dict)
+
+
 def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
     """
     Generate multiple theorems and proofs and return the tuple (datasets, problems)
@@ -328,13 +333,16 @@ def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
     all_steps = []
     all_first_steps = []
 
-    for i in range(num_probs):
-        if i % 100 == 0:
-            print("Problem {}".format(len(separate_problems) + 1))
-        steps = generate_problem(num_axioms, length, **kwargs)
-        all_steps.extend(steps)
-        all_first_steps.append(steps[0])
-        separate_problems.append(steps)
+    generate_problem_args = dict(num_axioms=num_axioms, length=length, **kwargs)
+
+    with ThreadPoolExecutor(max_workers=32) as executor:
+        for i, generated_steps in enumerate(
+                executor.map(generate_problem_wrapped, [generate_problem_args for _ in range(num_probs)])):
+            if i % 100 == 0:
+                print("Problem {}".format(len(separate_problems) + 1))
+            all_steps.extend(generated_steps)
+            all_first_steps.append(generated_steps[0])
+            separate_problems.append(generated_steps)
 
     random.shuffle(all_steps)
     random.shuffle(all_first_steps)
