@@ -238,7 +238,7 @@ def generate_problem(num_axioms, length, train_test, **kwargs):
     Generate one single theorem and its proof according to requirements
     Return the proof steps, from which the theorem can be easily extracted
     """
-    time_start = time.time()
+    # time_start = time.time()
 
     avoid_objective_names = kwargs.get("avoid_objective_names", [])
     # Get combos or orders ready
@@ -275,7 +275,7 @@ def _generate_many_problems(num: int, arg_dict):
     # print(f'generate_many_problems start num={num}')
     start_time = time.time()
     ans = [generate_problem(**arg_dict) for _ in range(num)]
-    print(f'generate_many_problems done num={num} time={time.time() - start_time}')
+    # print(f'generate_many_problems done num={num} time={time.time() - start_time}')
     return ans
 
 
@@ -354,6 +354,7 @@ def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
                 all_steps.extend(generated_steps)
                 all_first_steps.append(generated_steps[0])
                 separate_problems.append(generated_steps)
+            print(f'#Generated problems: {len(separate_problems)}')
 
     random.shuffle(all_steps)
     random.shuffle(all_first_steps)
