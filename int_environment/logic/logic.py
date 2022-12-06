@@ -1,8 +1,7 @@
-import string
 import math
-import pickle
-from copy import deepcopy
+import string
 from abc import ABC, abstractmethod
+from copy import deepcopy
 
 
 def _copy_input(inputs):
@@ -53,7 +52,8 @@ class NumericalFunction:
 
 
 class Entity:
-    def __init__(self, name=None, recent_numerical_function=None, operands=None, is_iv=False, is_constant=False, degree=0):
+    def __init__(self, name=None, recent_numerical_function=None, operands=None, is_iv=False, is_constant=False,
+                 degree=0):
         self.degree = degree
         self.index = None
         self.parent_index = None
@@ -90,6 +90,7 @@ class LogicStatement:
         node_count = []
         self.ent_dic = {0: self}
         self.ent = []
+
         def _graph_index(entity, parent_index):
             if entity.operands is None:
                 assert entity not in self.ent
@@ -109,6 +110,7 @@ class LogicStatement:
                 self.ent.append(entity)
                 for ent in entity.operands:
                     _graph_index(ent, entity.index)
+
         for ent in self.operands:
             _graph_index(ent, 0)
 
@@ -118,6 +120,7 @@ class LogicStatement:
                 for ent in entity.operands:
                     _update_name(ent)
                 entity.update_name()
+
         for ent in self.operands:
             _update_name(ent)
         self.name = (self.logic_function.name +
@@ -352,10 +355,10 @@ class Proof:
             proof_status += "{}. ".format(ind + 1) + axiom.name
         proof_status += "\nAssumptions of the proof:\n"
         for ind, assumption in enumerate(self.assumptions):
-            proof_status += "{}. ".format(ind+1) + assumption.name + ", "
+            proof_status += "{}. ".format(ind + 1) + assumption.name + ", "
         proof_status += "\nObjectives of the proof:\n"
         for ind, objective in enumerate(self.objectives):
-            proof_status += "{}. ".format(ind+1) + objective.name + ", "
+            proof_status += "{}. ".format(ind + 1) + objective.name + ", "
         proof_status += "\n Is the proof completed? {}\n\n".format(self.proved)
         proof_status += self.logic_chain
         proof_status += "*" * 200
