@@ -1,5 +1,5 @@
-from int_environment.proof_system.logic_functions import necessary_logic_functions
 from int_environment.proof_system.graph_seq_conversion import Parser
+from int_environment.proof_system.logic_functions import necessary_logic_functions
 
 
 class Prover:
@@ -165,6 +165,9 @@ class Prover:
 
     # Methods implemented differently in ProverBack and ProverLean
     def apply_theorem(self, theorem, operands):
+        if len(operands) != theorem.assumption_size:
+            return None
+
         # Apply a theorem with operands
         results = theorem.execute_th(operands, mode=self.mode_theorem)
         assumptions, conclusions = results["Assumptions"], results["Conclusions"]

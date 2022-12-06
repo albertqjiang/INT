@@ -232,9 +232,6 @@ class Proof:
         assumptions, conclusions = \
             results["Assumptions"], results["Conclusions"]
 
-        if len(operands) != theorem.assumption_size:
-            return 'REWARD_ASSUMPTION_INVALID'
-
         if self.statements_all_valid(assumptions):
             if self.statements_all_valid(conclusions):
                 return "REWARD_DUPLICATED_RESULTS"
