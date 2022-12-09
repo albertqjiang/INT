@@ -376,7 +376,8 @@ def train_eval_test(model, optimizer, kl_dict=None, all_data=None, resume_dir=No
         # Eval
         if len(val_dataset) > 0:
             time0 = time()
-            val_loss, val_lemma_acc, val_ent_acc, val_name_acc = validate(model, val_dataset, skip=epoch % 40 != 0)
+            val_loss, val_lemma_acc, val_ent_acc, val_name_acc = validate(model, val_dataset,
+                                                                          skip=epoch == 0 or epoch % 40 != 0)
             val_losses.append(val_loss)
             val_lemma_accs.append(val_lemma_acc)
             val_ent_accs.append(val_ent_acc)
@@ -385,7 +386,8 @@ def train_eval_test(model, optimizer, kl_dict=None, all_data=None, resume_dir=No
 
         # Test
         time0 = time()
-        test_loss, test_lemma_acc, test_ent_acc, test_name_acc = validate(model, eval_dataset, skip=epoch % 300 != 0)
+        test_loss, test_lemma_acc, test_ent_acc, test_name_acc = validate(model, eval_dataset,
+                                                                          skip=epoch == 0 or epoch % 300 != 0)
         test_losses.append(test_loss)
         test_lemma_accs.append(test_lemma_acc)
         test_ent_accs.append(test_ent_acc)
