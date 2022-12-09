@@ -204,8 +204,13 @@ def train_epoch(model, dataset, optimizer, updates):
 
 
 # Validate every epoch
-def validate(model, e_dataset):
+def validate(model, e_dataset, *, skip: bool):
     print('validate start')
+
+    if skip:
+        print('validate skipped')
+        return -1.0, -1.0, -1.0, -1.0
+
     model.eval()
     validation_batch = e_dataset.io_tuples[:args.evaluation_size]
     batch_states, batch_actions, batch_name_actions = batch_process(validation_batch, mode=args.obs_mode)
@@ -371,7 +376,7 @@ def train_eval_test(model, optimizer, kl_dict=None, all_data=None, resume_dir=No
         # Eval
         if len(val_dataset) > 0:
             time0 = time()
-            val_loss, val_lemma_acc, val_ent_acc, val_name_acc = validate(model, val_dataset)
+            val_loss, val_lemma_acc, val_ent_acc, val_name_acc = validate(model, val_dataset, skip=epoch % 40 != 0)
             val_losses.append(val_loss)
             val_lemma_accs.append(val_lemma_acc)
             val_ent_accs.append(val_ent_acc)
@@ -380,7 +385,7 @@ def train_eval_test(model, optimizer, kl_dict=None, all_data=None, resume_dir=No
 
         # Test
         time0 = time()
-        test_loss, test_lemma_acc, test_ent_acc, test_name_acc = validate(model, eval_dataset)
+        test_loss, test_lemma_acc, test_ent_acc, test_name_acc = validate(model, eval_dataset, skip=epoch % 300 != 0)
         test_losses.append(test_loss)
         test_lemma_accs.append(test_lemma_acc)
         test_ent_accs.append(test_ent_acc)
