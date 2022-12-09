@@ -84,7 +84,7 @@ python -m int_environment.visualization.display_proofs --proof-file $dump_path/p
 
 We prepare the training script for a graph-neural-network based agent.
 The command below trains the agent for 1 million updates in an online setting.
-We generate 1000 theorems and proofs with the setting k=3, l=3
+We generate 1000 theorems and proofs with the setting k=5, l=5
 and train 10 epochs on them before generating a new set of problems.
 The training results and models are dumped in directory `data/pt_models`.
 
