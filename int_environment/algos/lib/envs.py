@@ -1,9 +1,10 @@
 import os
-from baselines.common.vec_env.subproc_vec_env import SubprocVecEnv
+
 import gym
-from baselines import bench
 import numpy as np
+from baselines import bench
 from baselines.common.vec_env import VecEnv
+from baselines.common.vec_env.subproc_vec_env import SubprocVecEnv
 from baselines.common.vec_env.util import copy_obs_dict, dict_to_obs, obs_space_info
 
 
@@ -66,6 +67,7 @@ class DummyVecEnv(VecEnv):
     Useful when debugging and when num_env == 1 (in the latter case,
     avoids communication overhead)
     """
+
     def __init__(self, env_fns):
         """
         Arguments:
@@ -80,7 +82,7 @@ class DummyVecEnv(VecEnv):
 
         self.buf_obs = dict()
         self.buf_dones = np.zeros((self.num_envs,), dtype=np.bool)
-        self.buf_rews  = np.zeros((self.num_envs,), dtype=np.float32)
+        self.buf_rews = np.zeros((self.num_envs,), dtype=np.float32)
         self.buf_infos = [{} for _ in range(self.num_envs)]
         self.actions = None
         self.spec = self.envs[0].spec
@@ -96,7 +98,8 @@ class DummyVecEnv(VecEnv):
         if not listify:
             self.actions = actions
         else:
-            assert self.num_envs == 1, "actions {} is either not a list or has a wrong size - cannot match to {} environments".format(actions, self.num_envs)
+            assert self.num_envs == 1, "actions {} is either not a list or has a wrong size - cannot match to {} environments".format(
+                actions, self.num_envs)
             self.actions = [actions]
 
     def step_wait(self):
