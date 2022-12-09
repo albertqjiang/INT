@@ -418,6 +418,10 @@ def train_eval_test(model, optimizer, kl_dict=None, all_data=None, resume_dir=No
             save_checkpoint(model, optimizer, ckpt_dir=resume_dir, epoch=epoch,
                             extra=dict(epoch=epoch, updates=updates, best_val_succ=best_val_succ), is_last=True)
 
+        if epoch != 0 and epoch % 50 == 0:
+            save_checkpoint(model, optimizer, ckpt_dir=os.path.join(args.dump, str(timestamp)), epoch=epoch,
+                            extra=dict(epoch=epoch, updates=updates, best_val_succ=best_val_succ))
+
         if epoch != 0 and epoch % args.epoch_per_case_record == 0:
             print("rollout")
             # First-step rollouts
