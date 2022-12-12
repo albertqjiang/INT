@@ -342,7 +342,7 @@ def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
     all_steps = []
     all_first_steps = []
 
-    num_sub_works = 20
+    num_sub_works = 20 if num_probs > 20 else num_probs
     num_problems_per_subprocess = [num_probs // num_sub_works for _ in range(num_sub_works)]
     assert sum(num_problems_per_subprocess) == num_probs
     generate_problem_args = dict(num_axioms=num_axioms, length=length, **kwargs)
