@@ -1,6 +1,5 @@
-from int_environment.visualization.seq_parse import entity_to_seq_string, logic_statement_to_seq_string
 from int_environment.proof_system.all_axioms import all_axioms_to_prove
-
+from int_environment.visualization.seq_parse import entity_to_seq_string, logic_statement_to_seq_string
 
 compact_theorem_name = {
     "AdditionCommutativity": "add_cmmt",
@@ -93,6 +92,10 @@ class Parser:
         return self.filter_seq_string(target)
 
     def observation_to_source(self, observation):
+        # e.g. when it is already proved
+        if len(observation["objectives"]) == 0:
+            return None
+
         premises = observation["ground_truth"]
         premises_string = " & ".join([logic_statement_to_seq_string(premise) for premise in premises])
         if premises_string:
@@ -169,6 +172,7 @@ class Parser:
 if __name__ == "__main__":
     import json
     from int_environment.data_generation.generate_problems import generate_multiple_problems
+
     orders = json.load(open("/Users/qj213/Papers/My papers/INT_arXiv/INT/data/benchmark/ordered_field/orders.json"))
     dataset, problems = generate_multiple_problems(num_axioms=3, length=3,
                                                    num_probs=100, train_test="train",

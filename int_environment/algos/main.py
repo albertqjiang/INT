@@ -10,17 +10,17 @@ import json
 import os
 import pickle
 import random
-import numpy as np
 from datetime import datetime
 from time import time
 
+import numpy as np
 import torch
 import torch.optim as optim
 import torch.utils.data as data_handler
 
 from int_environment.algos.eval import eval_agent
-from int_environment.algos.lib.obs import nodename2index, thm2index, batch_process
 from int_environment.algos.lib.arguments import get_args
+from int_environment.algos.lib.obs import nodename2index, thm2index, batch_process
 from int_environment.data_generation.generate_problems import generate_multiple_problems
 from int_environment.data_generation.utils import Dataset
 
@@ -58,6 +58,7 @@ os.makedirs(os.path.join(args.dump, str(timestamp)))
 
 
 def load_checkpoint(model, optimizer, filename):
+    print(f'resume_checkpoint filename={filename}')
     checkpoint = torch.load(filename)
     model.load_state_dict(checkpoint['model'])
     optimizer.load_state_dict(checkpoint['optimizer'])
@@ -67,6 +68,7 @@ def load_checkpoint(model, optimizer, filename):
 def resume_checkpoint(model, optimizer, resume_dir):
     name = 'last_epoch.pth'
     fname = os.path.join(resume_dir, name)
+    print(f'resume_checkpoint fname={fname} exists={os.path.exists(fname)}')
     if os.path.exists(fname):
         extra = load_checkpoint(model, optimizer, fname)
         updates = extra['updates']
@@ -89,6 +91,7 @@ def save_checkpoint(model, optimizer, ckpt_dir, epoch, extra,
         'optimizer': optimizer.state_dict(),
         'extra': extra
     }
+    print(f'save_checkpoint fname={fname}')
     torch.save(state, fname)
 
 
@@ -132,6 +135,7 @@ def load_all_data(train_dirs, test_dirs):
 
 
 def load_model():
+    print('load_model start')
     options = dict(
         num_nodes=len(nodename2index),
         num_lemmas=len(thm2index),
@@ -152,11 +156,13 @@ def load_model():
 
 
 def load_optimizer(model):
+    print('load_optimizer start')
     return optim.Adam(model.parameters(), lr=args.lr)
 
 
 # Train epoch
 def train_epoch(model, dataset, optimizer, updates):
+    print('train_epoch start')
     time0 = time()
     total_loss = 0
     total_lemma_acc = 0
@@ -192,11 +198,15 @@ def train_epoch(model, dataset, optimizer, updates):
     name_acc = total_name_acc / minibatch
 
     print("Epoch time: {}s\n".format(time() - time0))
+    print(f'epoch end loss={loss} lemma_acc={lemma_acc} '
+          f'ent_acc={ent_acc} name_acc={name_acc} updates={updates}')
     return loss, lemma_acc, ent_acc, name_acc, updates
 
 
 # Validate every epoch
 def validate(model, e_dataset):
+    print('validate start')
+
     model.eval()
     validation_batch = e_dataset.io_tuples[:args.evaluation_size]
     batch_states, batch_actions, batch_name_actions = batch_process(validation_batch, mode=args.obs_mode)
@@ -208,6 +218,9 @@ def validate(model, e_dataset):
             )
         loss = -log_probs.mean()
     model.train()
+    print('validate end '
+          f'loss={loss.cpu().item()} lemma_acc={lemma_acc.cpu().item()} '
+          f'ent_acc={ent_acc.cpu().item()} name_acc={name_acc.cpu().item()}')
     return loss.cpu().item(), lemma_acc.cpu().item(), ent_acc.cpu().item(), name_acc.cpu().item()
 
 
@@ -239,6 +252,7 @@ def test_rollout(model, test_dataset, whole_dataset=False):
 
 
 def train_eval_test(model, optimizer, kl_dict=None, all_data=None, resume_dir=None, axiom_combo_dict=None):
+    print('train_eval_test start')
     if resume_dir:
         start_epoch, updates, best_val_succ = resume_checkpoint(model, optimizer, resume_dir)
     else:
@@ -312,8 +326,10 @@ def train_eval_test(model, optimizer, kl_dict=None, all_data=None, resume_dir=No
     timing = dict()
     record = dict()
     for epoch in range(start_epoch, args.epoch):
-        print(epoch)
+        print(f'train_eval_test loop epoch={epoch} start')
+
         if args.online and (regenerate_dataset or epoch % args.epochs_per_online_dataset == 0):
+            print('generate datasets')
             regenerate_dataset = False
             train_dataset = Dataset([])
             train_first_dataset = Dataset([])
@@ -402,7 +418,11 @@ def train_eval_test(model, optimizer, kl_dict=None, all_data=None, resume_dir=No
             save_checkpoint(model, optimizer, ckpt_dir=resume_dir, epoch=epoch,
                             extra=dict(epoch=epoch, updates=updates, best_val_succ=best_val_succ), is_last=True)
 
-        if epoch % args.epoch_per_case_record == 0:
+        if epoch != 0 and epoch % 50 == 0:
+            save_checkpoint(model, optimizer, ckpt_dir=os.path.join(args.dump, str(timestamp)), epoch=epoch,
+                            extra=dict(epoch=epoch, updates=updates, best_val_succ=best_val_succ))
+
+        if epoch != 0 and epoch % args.epoch_per_case_record == 0:
             print("rollout")
             # First-step rollouts
             time0 = time()
@@ -460,21 +480,28 @@ def train_eval_test(model, optimizer, kl_dict=None, all_data=None, resume_dir=No
             torch.save(model, os.path.join(args.dump, str(timestamp), "model_checkpoint.pt"))
         json.dump(timing, open(os.path.join(args.dump, str(timestamp), "timing.json"), "w"))
 
+    print('train_eval_test end')
+
 
 def main():
+    print('main() start')
     model = load_model()
     optimizer = load_optimizer(model)
     if args.online:
+        print('mode online')
         if args.online_order_generation:
             kl_dict = json.load(open(os.path.join(args.combo_path, "combinations.json"), "r"))
         else:
             kl_dict = json.load(open(os.path.join(args.combo_path, "orders.json"), "r"))
+        print('kl_dict loaded', len(kl_dict))
         train_eval_test(model, optimizer, kl_dict=kl_dict, resume_dir=args.resume_dir)
     else:
+        print('mode non-online')
         train_dirs = [os.path.join(args.path_to_data, train_dir) for train_dir in args.train_sets]
         test_dirs = [os.path.join(args.path_to_data, test_dir) for test_dir in args.test_sets]
         all_data = load_all_data(train_dirs, test_dirs)
         train_eval_test(model, optimizer, all_data=all_data, resume_dir=args.resume_dir)
+    print('main() end')
 
 
 if __name__ == "__main__":

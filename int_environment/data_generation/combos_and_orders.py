@@ -128,7 +128,7 @@ def generate_combinations_and_orders(available_axioms, max_l, max_k, trial_per_k
     return combinations, orders
 
 
-if __name__ == "__main__":
+def main(args=None):
     parser = argparse.ArgumentParser(description='ComboOrderGen')
     parser.add_argument('-cp', "--combo_path", required=False, type=str,
                         default="data/benchmark/field")
@@ -139,7 +139,7 @@ if __name__ == "__main__":
                         default=7)
     parser.add_argument("--trial", required=False, type=int,
                         default=100000)
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     if not os.path.isdir(args.combo_path):
         os.makedirs(args.combo_path)
 
@@ -151,3 +151,7 @@ if __name__ == "__main__":
     )
     json.dump(axiom_combinations, open(os.path.join(args.combo_path, "combinations.json"), "w"))
     json.dump(axiom_orders, open(os.path.join(args.combo_path, "orders.json"), "w"))
+
+
+if __name__ == "__main__":
+    main()

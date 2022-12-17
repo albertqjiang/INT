@@ -4,8 +4,6 @@ import os
 import pickle
 import random
 import shutil
-import time
-from concurrent.futures import ProcessPoolExecutor
 from copy import deepcopy
 
 from int_environment.data_generation.combos_and_orders import get_combo_order_info, randomize_one_axiom_order
@@ -271,14 +269,6 @@ def generate_problem(num_axioms, length, train_test, **kwargs):
     return returned_steps
 
 
-def _generate_many_problems(num: int, arg_dict):
-    # print(f'generate_many_problems start num={num}')
-    start_time = time.time()
-    ans = [generate_problem(**arg_dict) for _ in range(num)]
-    # print(f'generate_many_problems done num={num} time={time.time() - start_time}')
-    return ans
-
-
 def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
     """
     Generate multiple theorems and proofs and return the tuple (datasets, problems)
@@ -342,19 +332,13 @@ def generate_multiple_problems(num_axioms, length, num_probs, **kwargs):
     all_steps = []
     all_first_steps = []
 
-    num_sub_works = 20
-    num_problems_per_subprocess = [num_probs // num_sub_works for _ in range(num_sub_works)]
-    assert sum(num_problems_per_subprocess) == num_probs
-    generate_problem_args = dict(num_axioms=num_axioms, length=length, **kwargs)
-
-    with ProcessPoolExecutor(max_workers=20) as executor:
-        for generated_steps_arr in executor.map(_generate_many_problems, num_problems_per_subprocess,
-                                                (generate_problem_args for _ in range(num_sub_works))):
-            for generated_steps in generated_steps_arr:
-                all_steps.extend(generated_steps)
-                all_first_steps.append(generated_steps[0])
-                separate_problems.append(generated_steps)
-            print(f'#Generated problems: {len(separate_problems)}')
+    for i in range(num_probs):
+        if i % 100 == 0:
+            print("Problem {}".format(len(separate_problems) + 1))
+        steps = generate_problem(num_axioms, length, **kwargs)
+        all_steps.extend(steps)
+        all_first_steps.append(steps[0])
+        separate_problems.append(steps)
 
     random.shuffle(all_steps)
     random.shuffle(all_first_steps)
